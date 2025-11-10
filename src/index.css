@@ -73,15 +73,6 @@ body {
   align-items: center;
   gap: 12px;
 }
-/* .todo-item {
-  padding: 1rem;
-  background-color: #fff;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  width: 200px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  cursor: grab;
-} */
 
 .todo-item.completed span {
   text-decoration: line-through;
