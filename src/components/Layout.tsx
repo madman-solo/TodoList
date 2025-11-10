@@ -2,8 +2,9 @@
 import { Outlet, Link, useNavigate } from "react-router-dom";
 import { useThemeStore } from "../store";
 import { useUserStore } from "../store";
+import type { FC } from "react";
 
-const Layout = () => {
+const Layout: FC = () => {
   const { isDarkMode, toggleDarkMode } = useThemeStore();
   const { user, isAuthenticated, logout } = useUserStore();
   // const navigate = useNavigate();

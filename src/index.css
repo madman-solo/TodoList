@@ -137,3 +137,77 @@ body {
   flex-direction: column;
   gap: 0.5rem;
 }
+
+/* 容器样式 - 实现垂直排列的队列效果 */
+.todo-container {
+  max-width: 500px;
+  margin: 20px auto;
+  padding: 20px;
+  border: 1px solid #eee;
+  border-radius: 8px;
+}
+
+/* 输入框区域样式 */
+.todo-input {
+  margin-bottom: 20px;
+  display: flex;
+  gap: 10px;
+}
+
+.todo-input input {
+  flex: 1;
+  padding: 8px 12px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.todo-input button {
+  padding: 8px 16px;
+  background: #007bff;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+/* 列表容器 - 确保卡片垂直排列且有间距 */
+.todo-list {
+  display: flex;
+  flex-direction: column; /* 垂直排列 */
+  gap: 10px; /* 卡片之间的间距 */
+}
+
+/* 单个卡片样式 - 移除绝对定位，添加基础样式 */
+.todo-item {
+  padding: 12px 16px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  background: white;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  cursor: grab; /* 提示可拖拽 */
+  transition: all 0.2s;
+}
+
+.todo-item:active {
+  cursor: grabbing; /* 拖拽时的光标 */
+}
+
+.todo-item input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+}
+
+.todo-item span {
+  flex: 1;
+}
+
+.todo-item button {
+  padding: 4px 8px;
+  background: #dc3545;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
