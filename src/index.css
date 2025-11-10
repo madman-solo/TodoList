@@ -55,8 +55,25 @@ body {
   position: relative;
   margin: 2rem;
 }
+/* 在项目中添加全局样式（如 src/index.css） */
+.todo-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px; /* 卡片之间的间距 */
+  padding: 16px;
+}
 
 .todo-item {
+  position: relative; /* 移除绝对定位 */
+  padding: 12px;
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
+  background: white;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+/* .todo-item {
   padding: 1rem;
   background-color: #fff;
   border: 1px solid #ddd;
@@ -64,7 +81,7 @@ body {
   width: 200px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   cursor: grab;
-}
+} */
 
 .todo-item.completed span {
   text-decoration: line-through;
