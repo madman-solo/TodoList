@@ -16,7 +16,7 @@ body {
   padding: 1rem 2rem;
   background-color: #fff8f0; /* 暖白色背景 */
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
-  margin-bottom: 2rem;
+  margin-bottom: 5px;
 }
 
 .main-nav a,

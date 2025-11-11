@@ -20,7 +20,7 @@
 import { useTodoStore } from "../store";
 import TodoList from "../components/index.tsx";
 import Input from "../components/TodoList/Input/index.tsx";
-import MoodAndBlessing from "../components/MoodandBlessing.tsx";
+import MoodTracker from "../components/MoodTracker.tsx";
 const Home = () => {
   const { addTodo } = useTodoStore();
 
@@ -32,7 +32,7 @@ const Home = () => {
           <h2>添加夏日待办</h2>
           <Input onAdd={addTodo} />
           {/* 新增的心情和小确幸区域 */}
-          <MoodAndBlessing />
+          <MoodTracker />
         </div>
 
         {/* 右侧待办区域 */}
