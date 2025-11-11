@@ -71,7 +71,7 @@ body {
   background: white;
   display: flex;
   align-items: center;
-  gap: 12px;
+  /* gap: 12px; */
 }
 
 .todo-item.completed span {
@@ -131,7 +131,9 @@ body {
 
 /* 容器样式 - 实现垂直排列的队列效果 */
 .todo-container {
-  max-width: 500px;
+  display: flex;
+  flex-direction: column;
+  /* max-width: 500px; */
   margin: 20px auto;
   padding: 20px;
   border: 1px solid #eee;
@@ -161,14 +163,14 @@ body {
   cursor: pointer;
 }
 
-/* 列表容器 - 确保卡片垂直排列且有间距 */
+/* 列表容器 - 确保卡片垂直排列且有间距
 .todo-list {
   display: flex;
   flex-direction: column; /* 垂直排列 */
-  gap: 10px; /* 卡片之间的间距 */
-}
+/* gap: 10px; 卡片之间的间距 */
+/* } */
 
-/* 单个卡片样式 - 移除绝对定位，添加基础样式 */
+/* 单个卡片样式 - 移除绝对定位，添加基础样式
 .todo-item {
   padding: 12px 16px;
   border: 1px solid #ddd;
@@ -178,8 +180,8 @@ body {
   align-items: center;
   gap: 12px;
   cursor: grab; /* 提示可拖拽 */
-  transition: all 0.2s;
-}
+/* transition: all 0.2s; */
+/* } */
 
 .todo-item:active {
   cursor: grabbing; /* 拖拽时的光标 */

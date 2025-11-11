@@ -1,5 +1,5 @@
 // src/components/Layout.tsx
-import { Outlet, Link, useNavigate } from "react-router-dom";
+import { Outlet, Link } from "react-router-dom";
 import { useThemeStore } from "../store";
 import { useUserStore } from "../store";
 import type { FC } from "react";

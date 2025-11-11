@@ -20,13 +20,18 @@ interface TodoState {
     id: number;
     content: string;
     completed: boolean;
-    position: { x: number; y: number };
+    position: { x: number; y: number } | null;
   }[];
   addTodo: (content: string) => void;
   updateTodo: (id: number, content: string) => void;
   toggleTodo: (id: number) => void;
   removeTodo: (id: number) => void;
-  updatePosition: (id: number, position: { x: number; y: number }) => void;
+  updatePosition: (
+    fromIndex: number,
+    toIndex: number,
+    position?: { x: number; y: number }
+  ) => void;
+  initalPosition: (id: number, position: { x: number; y: number }) => void;
 }
 
 export const useUserStore = create<UserState>()(
@@ -55,14 +60,14 @@ export const useThemeStore = create<ThemeState>()(
 
 export const useTodoStore = create<TodoState>()(
   persist(
-    (set) => ({
+    (set, get) => ({
       todos: [],
       addTodo: (content) => {
         const newTodo = {
           id: Date.now(),
-          content,
+          content, //这是传进来的内容，从Input里传进来的
           completed: false,
-          position: { x: 0, y: 0 },
+          position: null, //重点：初始位置都是同一个地方，所以不能正确排列？
         };
         set((state) => ({ todos: [...state.todos, newTodo] }));
       },
@@ -82,65 +87,34 @@ export const useTodoStore = create<TodoState>()(
         set((state) => ({
           todos: state.todos.filter((todo) => todo.id !== id),
         })),
-      updatePosition: (id, position) =>
+      initalPosition: (id: number, position: { x: number; y: number }) => {
         set((state) => ({
           todos: state.todos.map((todo) =>
             todo.id === id ? { ...todo, position } : todo
           ),
-        })),
+        }));
+      },
+      // 正确的 updatePosition 实现：基于索引交换位置
+      updatePosition: (
+        fromIndex: number,
+        toIndex: number,
+        position?: { x: number; y: number }
+      ) => {
+        // 通过 get() 获取当前状态
+        const currentTodos = get().todos;
+        // 复制数组并调整顺序
+        const newTodos = [...currentTodos];
+        const [movedItem] = newTodos.splice(fromIndex, 1); // 从原索引移除
+        // 如果传递了 position，更新移动后项的位置
+        if (position) {
+          movedItem.position = position;
+        }
+        newTodos.splice(toIndex, 0, movedItem); // 插入新索引
+
+        // 通过 set() 更新状态
+        set({ todos: newTodos });
+      },
     }),
     { name: "todo-storage" }
   )
 );
-
-// import { create } from "zustand";
-// import { persist } from "zustand/middleware";
-
-// // 定义待办事项类型
-// interface ITodo {
-//   id: number;
-//   content: string;
-//   completed: boolean;
-// }
-
-// // 状态仓库
-// export const useTodoStore = create(
-//   persist(
-//     (set, get) => ({
-//       todoList: [] as ITodo[],
-//       // 添加待办
-//       addTodo: (content: string) => {
-//         if (content.trim()) {
-//           set({
-//             todoList: [
-//               ...get().todoList,
-//               { id: Date.now(), content, completed: false },
-//             ],
-//           });
-//         }
-//       },
-//       // 切换完成状态
-//       toggleTodo: (id: number) => {
-//         set({
-//           todoList: get().todoList.map((todo) =>
-//             todo.id === id ? { ...todo, completed: !todo.completed } : todo
-//           ),
-//         });
-//       },
-//       // 删除待办
-//       removeTodo: (id: number) => {
-//         set({
-//           todoList: get().todoList.filter((todo) => todo.id !== id),
-//         });
-//       },
-//       // 拖拽排序
-//       reorderTodos: (fromIndex: number, toIndex: number) => {
-//         const newTodoList = [...get().todoList];
-//         const [movedItem] = newTodoList.splice(fromIndex, 1);
-//         newTodoList.splice(toIndex, 0, movedItem);
-//         set({ todoList: newTodoList });
-//       },
-//     }),
-//     { name: "todo-storage" } // 持久化存储到 localStorage
-//   )
-// );

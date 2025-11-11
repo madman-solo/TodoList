@@ -1,147 +1,19 @@
-// import React, { useCallback, useRef } from "react";
-// import type { ITodo } from "../../typings";
-// import { useDrop, useDrag } from "react-dnd";
-// import Item from "./Item";
-// interface IProps {
-//   todoList: ITodo[];
-//   toggleTodo: (id: number) => void;
-//   removeTodo: (id: number) => void;
-//   reorderTodos: (fromIndex: number, toIndex: number) => void;
-// }
+// import { useTodoStore } from "../../../store";
+// import Item from "./Item.tsx";
+// import type { ITodo } from "../../typings/index.tsx";
 
-// const List = (props: IProps) => {
-//   const { todoList, toggleTodo, removeTodo, reorderTodos } = props;
+// const List = () => {
+//   const { todos } = useTodoStore();
 
-//   // 容器接收拖拽：绑定到列表容器
-//   const [, drop] = useDrop({
-//     accept: "TODO_ITEM",
-//     // 拖拽结束时触发排序
-//     drop: (
-//       item: {
-//         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-//         hoverIndex: any;
-//         index: number;
-//       },
-//       monitor
-//     ) => {
-//       const dragIndex = item.index;
-//       // 获取当前鼠标悬停的目标索引（通过自定义数据传递）
-//       const hoverIndex = item.hoverIndex;
-//       if (dragIndex !== hoverIndex && hoverIndex !== undefined) {
-//         reorderTodos(dragIndex, hoverIndex);
-//       }
-//     },
-//   });
+//   if (!todos.length) {
+//     return <div className="todo-list-empty">暂无待办项</div>;
+//   }
 
-//   // 可拖拽的 Todo 项组件（内部组件，处理单个项的拖拽）
-//   const TodoItem = ({
-//     todo,
-//     index,
-//     toggleTodo,
-//     removeTodo,
-//   }: {
-//     todo: ITodo;
-//     index: number;
-//     toggleTodo: (id: number) => void;
-//     removeTodo: (id: number) => void;
-//   }) => {
-//     const ref = React.useRef<HTMLDivElement>(null);
-
-//     // 拖拽源配置：定义当前拖拽项的信息
-//     const [{ isDragging }, drag] = useDrag({
-//       type: "TODO_ITEM",
-//       item: {
-//         type: "TODO_ITEM",
-//         id: todo.id,
-//         index, // 拖拽项的初始索引
-//         hoverIndex: index, // 用于记录悬停目标的索引
-//       },
-//       collect: (monitor) => ({
-//         isDragging: monitor.isDragging(), // 拖拽时的视觉反馈
-//       }),
-//     });
-
-//     // 让当前项同时具备"被拖拽"和"接收拖拽"的能力
-//     const [, drop] = useDrop({
-//       accept: "TODO_ITEM",
-//       // 当其他项拖拽到当前项上方时，更新目标索引
-//       hover: (item: { index: number; hoverIndex: number }) => {
-//         // 避免自己拖自己
-//         if (item.index === index) return;
-//         // 更新目标索引为当前项的索引
-//         item.hoverIndex = index;
-//       },
-//     });
-
-//     // 组合拖拽和接收的 ref
-//     const combinedRef = React.useCallback(
-//       (node: HTMLDivElement | null) => {
-//         ref.current = node;
-//         drag(node);
-//         drop(node);
-//       },
-//       [drag, drop]
-//     );
-
-//     return (
-//       <div
-//         ref={combinedRef} // 绑定组合后的 ref
-//         className="todo-item"
-//         style={{
-//           opacity: isDragging ? 0.5 : 1,
-//           padding: "12px",
-//           margin: "8px 0", // 避免卡片覆盖
-//           border: "1px solid #ddd",
-//           borderRadius: "4px",
-//           backgroundColor: "white",
-//           cursor: "grab",
-//         }}
-//       >
-//         <input
-//           type="checkbox"
-//           checked={todo.completed}
-//           className={todo.completed ? "completed" : "active"}
-//           aria-label="完成待办项"
-//           onChange={() => toggleTodo(todo.id)}
-//         />
-//         <span
-//           style={{
-//             textDecoration: todo.completed ? "line-through" : "",
-//             margin: "0 12px",
-//           }}
-//         >
-//           {todo.content}
-//         </span>
-//         <button
-//           onClick={() => removeTodo(todo.id)}
-//           style={{ marginLeft: "auto" }}
-//         >
-//           删除
-//         </button>
-//       </div>
-//     );
-//   };
-//   const containerRef = useRef<HTMLDivElement>(null); // 用于获取 DOM 引用（可选）
-//   // 回调 ref：先绑定 DOM 引用，再执行 drop 函数
-//   const handleRef = useCallback(
-//     (node: HTMLDivElement | null) => {
-//       containerRef.current = node; // 保存 DOM 引用（如果需要）
-//       drop(node); // 将元素标记为拖拽目标
-//     },
-//     [drop]
-//   );
 //   return (
-//     // 绑定容器的 drop ref，确保能接收拖拽事件
-//     <div className="todo-list" ref={handleRef}>
-//       {todoList.map((todo: ITodo, index: number) => (
-//         // 使用带拖拽逻辑的 TodoItem 组件，而非 Item
-//         <TodoItem
-//           key={todo.id} // 必须用唯一 key
-//           todo={todo}
-//           index={index} // 传递当前项的索引（关键：用于排序）
-//           toggleTodo={toggleTodo}
-//           removeTodo={removeTodo}
-//         />
+//     <div className="todo-list">
+//       {todos.map((todo: ITodo, index) => (
+//         // 这里传入的index是为了标识每个待办项的位置，以便在拖拽时进行位置交换
+//         <Item key={todo.id} todo={todo} index={index} />
 //       ))}
 //     </div>
 //   );
@@ -149,23 +21,112 @@
 
 // export default List;
 
-import React from "react";
-import { useTodoStore } from "../../../store";
-import Item from "./Item.tsx";
+// components/TodoList/List.tsx
+import { useState } from "react";
+import {
+  DndContext,
+  type DragEndEvent,
+  useDraggable,
+  useDroppable,
+  DragOverlay,
+} from "@dnd-kit/core";
+import { CSS } from "@dnd-kit/utilities";
+import Item from "./Item"; // 导入 Item 组件
+import type { ITodo } from "../../typings/index"; // 导入 ITodo 类型
 
-const List = () => {
-  const { todoList } = useTodoStore();
+// 定义 List 接收的 props
+interface ListProps {
+  todos: ITodo[]; // 待办项列表
+  onToggle: (id: number) => void; // 切换完成状态方法
+  onRemove: (id: number) => void; // 删除方法
+  onUpdate: (id: number, content: string) => void; // 更新内容方法
+  onUpdatePosition: (
+    activeIndex: number,
+    overIndex: number,
+    position?: { x: number; y: number }
+  ) => void; // 拖拽排序方法
+}
 
-  if (!todoList.length) {
+const List = ({
+  todos,
+  onToggle,
+  onRemove,
+  onUpdate,
+  onUpdatePosition,
+}: ListProps) => {
+  const [activeId, setActiveId] = useState<number | null>(null);
+
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+    if (!over) {
+      setActiveId(null);
+      return;
+    }
+
+    const activeIndex = active.data.current?.index; // 从拖拽数据中获取 activeIndex
+    const overIndex = over.data.current?.index; // 获取 overIndex
+
+    if (activeIndex !== undefined && overIndex !== undefined) {
+      // 不再尝试从 over 上访问 DOM 节点，直接传递索引进行位置更新
+      onUpdatePosition(activeIndex, overIndex);
+    }
+
+    setActiveId(null);
+  };
+
+  // 放置区域组件
+  const DroppableArea = () => {
+    const { setNodeRef } = useDroppable({ id: "todo-container" });
+
+    return (
+      <div ref={setNodeRef} className="todo-container">
+        {todos.map((todo) => (
+          <Item
+            key={todo.id}
+            todo={todo}
+            onToggle={onToggle}
+            onRemove={onRemove}
+            onUpdate={onUpdate}
+          />
+        ))}
+      </div>
+    );
+  };
+
+  // 拖拽覆盖层组件
+  const DragOverlayItem = () => {
+    if (!activeId) return null;
+    const todo = todos.find((t) => t.id === activeId);
+    if (!todo) return null;
+
+    return (
+      <div
+        className={`todo-item drag-overlay ${
+          todo.completed ? "completed" : ""
+        }`}
+      >
+        <span>{todo.content}</span>
+      </div>
+    );
+  };
+
+  // 空状态处理
+  if (!todos.length) {
     return <div className="todo-list-empty">暂无待办项</div>;
   }
 
   return (
-    <div className="todo-list">
-      {todoList.map((todo, index) => (
-        <Item key={todo.id} todo={todo} index={index} />
-      ))}
-    </div>
+    <DndContext
+      onDragStart={(event) => setActiveId(Number(event.active.id))}
+      onDragEnd={handleDragEnd}
+    >
+      <div className="todo-drag-area">
+        <DroppableArea />
+      </div>
+      <DragOverlay>
+        <DragOverlayItem />
+      </DragOverlay>
+    </DndContext>
   );
 };
 
