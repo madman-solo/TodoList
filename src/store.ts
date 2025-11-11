@@ -94,24 +94,16 @@ export const useTodoStore = create<TodoState>()(
           ),
         }));
       },
-      // 正确的 updatePosition 实现：基于索引交换位置
-      updatePosition: (
-        fromIndex: number,
-        toIndex: number,
-        position?: { x: number; y: number }
-      ) => {
-        // 通过 get() 获取当前状态
+      // 更新 updatePosition 方法，确保正确交换位置
+      updatePosition: (fromIndex: number, toIndex: number) => {
         const currentTodos = get().todos;
-        // 复制数组并调整顺序
         const newTodos = [...currentTodos];
-        const [movedItem] = newTodos.splice(fromIndex, 1); // 从原索引移除
-        // 如果传递了 position，更新移动后项的位置
-        if (position) {
-          movedItem.position = position;
-        }
-        newTodos.splice(toIndex, 0, movedItem); // 插入新索引
 
-        // 通过 set() 更新状态
+        // 交换位置
+        const temp = newTodos[fromIndex];
+        newTodos[fromIndex] = newTodos[toIndex];
+        newTodos[toIndex] = temp;
+
         set({ todos: newTodos });
       },
     }),

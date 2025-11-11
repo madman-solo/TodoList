@@ -6,7 +6,11 @@ const Home = () => {
 
   return (
     <div className="home-page">
-      <TodoList />
+      {/* 上部添加区域 */}
+      <div className="todo-upper-section">
+        <h1>夏日待办清单</h1>
+        <TodoList />
+      </div>
     </div>
   );
 };
