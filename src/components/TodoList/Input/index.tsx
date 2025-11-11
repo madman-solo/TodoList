@@ -1,4 +1,4 @@
-import React, { useRef } from "react";
+import { useRef } from "react";
 
 interface InputProps {
   onAdd: (content: string) => void; // 通过 props 接收添加方法
