@@ -26,11 +26,11 @@ import { useState } from "react";
 import {
   DndContext,
   type DragEndEvent,
-  useDraggable,
+  // useDraggable,
   useDroppable,
   DragOverlay,
 } from "@dnd-kit/core";
-import { CSS } from "@dnd-kit/utilities";
+// import { CSS } from "@dnd-kit/utilities";
 import Item from "./Item"; // 导入 Item 组件
 import type { ITodo } from "../../typings/index"; // 导入 ITodo 类型
 
@@ -45,6 +45,7 @@ interface ListProps {
     overIndex: number,
     position?: { x: number; y: number }
   ) => void; // 拖拽排序方法
+  initialPosition: (id: number, position: { x: number; y: number }) => void; // 初始位置设置
 }
 
 const List = ({
@@ -53,6 +54,7 @@ const List = ({
   onRemove,
   onUpdate,
   onUpdatePosition,
+  initialPosition,
 }: ListProps) => {
   const [activeId, setActiveId] = useState<number | null>(null);
 
@@ -82,11 +84,13 @@ const List = ({
       <div ref={setNodeRef} className="todo-container">
         {todos.map((todo) => (
           <Item
-            key={todo.id}
+            index={todo.id}
             todo={todo}
             onToggle={onToggle}
             onRemove={onRemove}
             onUpdate={onUpdate}
+            onUpdatePosition={onUpdatePosition}
+            initialPosition={initialPosition}
           />
         ))}
       </div>

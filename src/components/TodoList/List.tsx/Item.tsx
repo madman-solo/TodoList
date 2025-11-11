@@ -140,7 +140,7 @@ const Item = ({
   onToggle,
   onRemove,
   onUpdate,
-  onUpdatePosition,
+  // onUpdatePosition,
   initialPosition,
 }: ItemProps) => {
   const { id, content, completed, position } = todo;

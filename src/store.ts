@@ -31,7 +31,7 @@ interface TodoState {
     toIndex: number,
     position?: { x: number; y: number }
   ) => void;
-  initalPosition: (id: number, position: { x: number; y: number }) => void;
+  initialPosition: (id: number, position: { x: number; y: number }) => void;
 }
 
 export const useUserStore = create<UserState>()(
@@ -87,7 +87,7 @@ export const useTodoStore = create<TodoState>()(
         set((state) => ({
           todos: state.todos.filter((todo) => todo.id !== id),
         })),
-      initalPosition: (id: number, position: { x: number; y: number }) => {
+      initialPosition: (id: number, position: { x: number; y: number }) => {
         set((state) => ({
           todos: state.todos.map((todo) =>
             todo.id === id ? { ...todo, position } : todo

@@ -7,8 +7,15 @@ import { HTML5Backend } from "react-dnd-html5-backend";
 
 const TodoList = () => {
   // 从 store 获取所有需要的数据和方法
-  const { todos, addTodo, toggleTodo, removeTodo, updateTodo, updatePosition } =
-    useTodoStore();
+  const {
+    todos,
+    addTodo,
+    toggleTodo,
+    removeTodo,
+    updateTodo,
+    updatePosition,
+    initialPosition,
+  } = useTodoStore();
   return (
     <DndProvider backend={HTML5Backend}>
       <div className="todo-container">
@@ -19,6 +26,7 @@ const TodoList = () => {
           onRemove={removeTodo}
           onUpdate={updateTodo}
           onUpdatePosition={updatePosition}
+          initialPosition={initialPosition}
         />
       </div>
     </DndProvider>
