@@ -5,8 +5,8 @@ import {
   FaMeh,
   FaFrown,
   FaStar,
-  FaSun,
-  FaHeart,
+  // FaSun,
+  // FaHeart,
 } from "react-icons/fa";
 import { css } from "@emotion/react";
 

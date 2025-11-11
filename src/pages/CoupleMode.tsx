@@ -1,27 +1,53 @@
-// // src/pages/CoupleMode.tsx
-// import { Link } from "react-router-dom";
-
-// const CoupleMode = () => {
-//   return (
-//     <div className="couple-mode">
-//       <h2>情侣模式</h2>
-//       <p>这里是情侣模式的功能实现</p>
-//       <Link to="/">返回首页</Link>
-//     </div>
-//   );
-// };
-
-// export default CoupleMode;
 /** @jsxImportSource @emotion/react */
 
 import { Outlet, Link, useLocation } from "react-router-dom";
 import { css } from "@emotion/react";
+import { useState, useEffect } from "react";
+import { useThemeStore } from "../store";
 
 const CoupleMode = () => {
   const location = useLocation();
-
+  const { isDarkMode } = useThemeStore();
+  const [starPositions, setStarPositions] = useState<
+    Array<{
+      top: string;
+      left: string;
+      size: number;
+      opacity: number;
+      delay: number;
+    }>
+  >([]);
+  // 生成星空效果
+  useEffect(() => {
+    const stars = Array.from({ length: 150 }, () => ({
+      top: `${Math.random() * 100}vh`,
+      left: `${Math.random() * 100}vw`,
+      size: Math.random() * 3 + 1,
+      opacity: Math.random() * 0.8 + 0.2,
+      delay: Math.random() * 5,
+    }));
+    setStarPositions(stars);
+  }, []);
   return (
-    <div css={container}>
+    // <div css={container}>
+    <div className={`couple-mode ${isDarkMode ? "dark-mode" : "light-mode"}`}>
+      {/* 星空背景 */}
+      <div className="starry-sky">
+        {starPositions.map((star, index) => (
+          <div
+            key={index}
+            className="star"
+            style={{
+              top: star.top,
+              left: star.left,
+              width: `${star.size}px`,
+              height: `${star.size}px`,
+              opacity: star.opacity,
+              animationDelay: `${star.delay}s`,
+            }}
+          />
+        ))}
+      </div>
       <nav css={coupleNav}>
         <Link to="table" css={navLink(location.pathname.endsWith("table"))}>
           表格样式
@@ -41,6 +67,9 @@ const CoupleMode = () => {
         <Link to="games" css={navLink(location.pathname.endsWith("games"))}>
           情侣小游戏
         </Link>
+        <Link to="/" className="back-link">
+          返回首页
+        </Link>
       </nav>
       <main css={mainContent}>
         <Outlet />
@@ -50,18 +79,14 @@ const CoupleMode = () => {
 };
 
 // 样式
-const container = css`
-  padding: 20px;
-  min-height: 100vh;
-`;
 
 const coupleNav = css`
-  display: flex;
-  gap: 1rem;
-  padding: 1rem;
-  background: #ffe6ea;
-  border-radius: 8px;
-  margin-bottom: 20px;
+  position: relative;
+  z-index: 10;
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 2rem 1rem;
+  text-align: center;
 `;
 
 const navLink = (isActive: boolean) => css`

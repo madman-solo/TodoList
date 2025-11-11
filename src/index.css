@@ -381,5 +381,147 @@ body {
 }
 
 .auth-form button:hover {
-  background-color: #20715d;
+  background-color: #cdf691;
+}
+
+/* //情侣 首页 */
+.couple-mode {
+  min-height: 100vh;
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(135deg, #0b1a3a 0%, #1a0b3a 40%, #2d0e47 100%);
+  color: #f0e6d6;
+}
+
+.starry-sky {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+.star {
+  position: absolute;
+  background-color: #fff;
+  border-radius: 50%;
+  box-shadow: 0 0 10px rgba(255, 255, 255, 0.8);
+  animation: twinkle 3s infinite alternate;
+}
+
+@keyframes twinkle {
+  0% {
+    opacity: 0.3;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+.navLink:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 6px 20px rgba(249, 224, 118, 0.2);
+}
+.back-link {
+  display: inline-block;
+  margin-top: 2rem;
+  padding: 0.8rem 1.5rem;
+  background: rgba(249, 224, 118, 0.2);
+  color: #f9e076;
+  border: 1px solid #f9e076;
+  border-radius: 4px;
+  text-decoration: none;
+  transition: all 0.3s ease;
+}
+
+.back-link:hover {
+  background: rgba(249, 224, 118, 0.4);
+}
+/* 响应式设计优化 */
+/* 响应式布局 - 手机适配 */
+@media (max-width: 768px) {
+  /* 导航栏适配 */
+  .main-nav {
+    flex-wrap: wrap;
+    padding: 0.8rem;
+    gap: 0.5rem;
+  }
+
+  .main-nav a,
+  .main-nav button {
+    padding: 0.4rem 0.8rem;
+    font-size: 0.9rem;
+  }
+
+  /* 首页样式适配 */
+  .todo-input-section {
+    margin: 1rem 0.5rem;
+    flex-direction: column;
+  }
+
+  .todo-input {
+    flex-direction: column;
+    gap: 0.8rem;
+    padding: 0 0.5rem;
+  }
+
+  .todo-input input {
+    padding: 0.8rem;
+    font-size: 1rem;
+  }
+
+  .todo-input button {
+    padding: 0.8rem;
+  }
+
+  /* 列表项适配 */
+  .todo-list {
+    padding: 0.8rem;
+  }
+
+  .todo-item {
+    padding: 0.8rem;
+    gap: 0.8rem;
+  }
+
+  /* 背景选择器适配 */
+  .background-options {
+    margin: 1rem;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.8rem;
+  }
+
+  .background-option {
+    height: 120px;
+  }
+
+  /* 表单适配 */
+  .auth-form {
+    margin: 1rem;
+    padding: 1rem;
+  }
+
+  /* 情侣模式适配 */
+  .coupleNav {
+    grid-template-columns: 1fr;
+    padding: 0 0.5rem;
+  }
+}
+
+/* 确保移动设备上内容不被截断 */
+html,
+body {
+  width: 100%;
+  overflow-x: hidden;
+}
+
+/* 按钮和交互元素在移动设备上更大更容易点击 */
+button,
+.back-link,
+.main-nav a,
+.main-nav button {
+  min-height: 44px;
+  min-width: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
