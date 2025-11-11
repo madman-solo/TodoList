@@ -1,6 +1,5 @@
-// src/pages/BackgroundSelector.tsx
 import { useThemeStore } from "../store";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 
 const backgrounds = [
   { id: "default", name: "默认" },
@@ -11,27 +10,46 @@ const backgrounds = [
 ];
 
 const BackgroundSelector = () => {
-  const { background, setBackground } = useThemeStore();
+  const { background, setBackground, isDarkMode } = useThemeStore();
   const navigate = useNavigate();
 
   return (
-    <div className="background-selector">
-      <h2>选择背景</h2>
-      <div className="background-options">
+    <div
+      className={`background-selector ${
+        isDarkMode ? "dark-mode" : "light-mode"
+      }`}
+    >
+      {/* 顶部导航栏 */}
+      <nav className="background-nav">
         {backgrounds.map((bg) => (
-          <div
+          <button
             key={bg.id}
-            className={`background-option ${
-              bg.id === background ? "selected" : ""
-            }`}
-            style={{ backgroundImage: `url(/backgrounds/${bg.id}.jpg)` }}
+            className={bg.id === background ? "selected" : ""}
             onClick={() => setBackground(bg.id)}
           >
-            <span>{bg.name}</span>
-          </div>
+            {bg.name}
+          </button>
         ))}
+        <button onClick={() => navigate("/")} className="home-btn">
+          返回首页
+        </button>
+      </nav>
+
+      {/* 背景预览区 */}
+      <div className="background-preview">
+        <h2>背景预览</h2>
+        <div
+          className="preview-area"
+          style={{
+            backgroundImage: `url(/backgrounds/${background}.jpg)`,
+            backgroundSize: "cover",
+            backgroundPosition: "center",
+            height: "70vh",
+            borderRadius: "8px",
+            margin: "20px",
+          }}
+        />
       </div>
-      <button onClick={() => navigate("/")}>返回首页</button>
     </div>
   );
 };

@@ -239,7 +239,10 @@ const List = ({
       onDragEnd={handleDragEnd}
     >
       <div className="todo-drag-area">
-        <DroppableArea />
+        {/* 关键：添加 todo-container 类名 */}
+        <div className="todo-container">
+          <DroppableArea />
+        </div>
       </div>
       <DragOverlay>
         <DragOverlayItem />

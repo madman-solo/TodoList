@@ -5,12 +5,19 @@ import { useUserStore } from "../store";
 import type { FC } from "react";
 
 const Layout: FC = () => {
-  const { isDarkMode, toggleDarkMode } = useThemeStore();
+  const { isDarkMode, toggleDarkMode, background } = useThemeStore();
   const { user, isAuthenticated, logout } = useUserStore();
-  // const navigate = useNavigate();
 
   return (
-    <div className={isDarkMode ? "dark-mode" : "light-mode"}>
+    <div
+      className={isDarkMode ? "dark-mode" : "light-mode"}
+      style={{
+        backgroundImage: `url(/backgrounds/${background}.jpg)`,
+        backgroundSize: "cover",
+        backgroundAttachment: "fixed",
+        minHeight: "100vh",
+      }}
+    >
       <nav className="main-nav">
         <Link to="/background">切换背景</Link>
         <button onClick={toggleDarkMode}>
