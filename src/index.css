@@ -717,3 +717,488 @@ body {
     opacity: 1;
   }
 }
+
+/* 背景选择器页面样式 */
+.background-selector {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  padding: 0;
+}
+
+/* 顶部导航栏 */
+.background-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(10px);
+  padding: 1rem;
+  box-shadow: var(--shadow);
+}
+
+.dark-mode .background-header {
+  background: rgba(34, 40, 49, 0.9);
+}
+
+.search-bar {
+  display: flex;
+  align-items: center;
+  margin-bottom: 1rem;
+  position: relative;
+}
+
+.search-input {
+  width: 100%;
+  padding: 0.8rem 1rem 0.8rem 2.5rem;
+  border-radius: 30px;
+  border: none;
+  background: rgba(240, 240, 240, 0.8);
+  font-size: 0.9rem;
+}
+
+.dark-mode .search-input {
+  background: rgba(57, 62, 70, 0.8);
+  color: var(--light);
+}
+
+.search-icon {
+  position: absolute;
+  left: 0.8rem;
+  color: #999;
+}
+
+.background-nav {
+  display: flex;
+  overflow-x: auto;
+  gap: 0.8rem;
+  padding-bottom: 0.5rem;
+}
+
+.nav-item {
+  padding: 0.6rem 1.2rem;
+  border: none;
+  border-radius: 20px;
+  background: transparent;
+  font-weight: 500;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.nav-item.selected {
+  background: var(--primary);
+  color: white;
+}
+
+/* 中间内容区 */
+.background-content {
+  flex: 1;
+  margin-top: 130px; /* 顶部导航高度 */
+  margin-bottom: 70px; /* 底部导航高度 */
+  padding: 0 1rem;
+  overflow-y: auto;
+}
+
+.content-section {
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(10px);
+  border-radius: 15px;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+  box-shadow: var(--shadow);
+}
+
+.dark-mode .content-section {
+  background: rgba(34, 40, 49, 0.8);
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.2rem;
+}
+
+.more-btn {
+  padding: 0.4rem 1rem;
+  border: 1px solid var(--primary);
+  border-radius: 20px;
+  background: transparent;
+  color: var(--primary);
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.more-btn:hover {
+  background: var(--primary);
+  color: white;
+}
+
+.item-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+  gap: 1rem;
+}
+
+.grid-item {
+  aspect-ratio: 1;
+  border-radius: 10px;
+  transition: transform 0.3s ease;
+  cursor: pointer;
+}
+
+.grid-item:hover {
+  transform: scale(1.05);
+}
+
+/* 底部导航栏 */
+.background-footer,
+.daily-footer {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  height: 70px;
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(10px);
+  box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.dark-mode .background-footer,
+.dark-mode .daily-footer {
+  background: rgba(34, 40, 49, 0.9);
+}
+
+.footer-btn {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  border: none;
+  background: transparent;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.footer-btn.active,
+.footer-btn:hover {
+  background: var(--primary);
+  color: white;
+}
+
+/* 每日精选页面样式 */
+.daily-selection {
+  min-height: 100vh;
+  padding-top: 2rem;
+  padding-bottom: 70px;
+}
+
+.daily-content {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+
+.carousel-container {
+  display: flex;
+  overflow-x: auto;
+  padding: 2rem 0;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+}
+
+.carousel-item {
+  min-width: 80%;
+  margin-right: 1rem;
+  border-radius: 20px;
+  overflow: hidden;
+  background-size: cover;
+  background-position: center;
+  height: 50vh;
+  scroll-snap-align: start;
+  position: relative;
+  box-shadow: var(--shadow);
+}
+
+.carousel-item.active {
+  transform: scale(1.02);
+}
+
+.item-info {
+  position: absolute;
+  top: 1.5rem;
+  left: 1.5rem;
+  color: white;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.item-actions {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: space-around;
+  padding: 1rem;
+  background: linear-gradient(transparent, rgba(0, 0, 0, 0.7));
+}
+
+.action-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(255, 255, 255, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.action-btn.active {
+  color: var(--secondary);
+  background: white;
+}
+
+/* 评论页面样式 */
+.comment-page {
+  min-height: 100vh;
+  padding-bottom: 80px;
+}
+
+.comment-header {
+  display: flex;
+  align-items: center;
+  padding: 1.5rem 1rem;
+  border-bottom: 1px solid #eee;
+  position: sticky;
+  top: 0;
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(10px);
+  z-index: 10;
+}
+
+.dark-mode .comment-header {
+  background: rgba(34, 40, 49, 0.9);
+  border-bottom-color: #444;
+}
+
+.back-btn {
+  background: transparent;
+  border: none;
+  margin-right: 1rem;
+  cursor: pointer;
+  color: inherit;
+}
+
+.comments-list {
+  padding: 1rem;
+}
+
+.comment-item {
+  display: flex;
+  gap: 1rem;
+  padding: 1rem 0;
+  border-bottom: 1px solid #eee;
+}
+
+.dark-mode .comment-item {
+  border-bottom-color: #444;
+}
+
+.user-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.comment-header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 0.3rem;
+}
+
+.user-name {
+  font-weight: 600;
+}
+
+.comment-time {
+  font-size: 0.8rem;
+  color: #999;
+}
+
+.comment-input-area {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  gap: 0.5rem;
+  padding: 1rem;
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(10px);
+  border-top: 1px solid #eee;
+}
+
+.dark-mode .comment-input-area {
+  background: rgba(34, 40, 49, 0.9);
+  border-top-color: #444;
+}
+
+.comment-input {
+  flex: 1;
+  padding: 0.8rem 1rem;
+  border-radius: 30px;
+  border: 1px solid #ddd;
+  background: white;
+}
+
+.dark-mode .comment-input {
+  background: #2d3436;
+  border-color: #555;
+  color: white;
+}
+
+.send-btn {
+  width: 45px;
+  height: 45px;
+  border-radius: 50%;
+  border: none;
+  background: var(--primary);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.send-btn:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+}
+
+/* 我的页面样式 */
+.my-page {
+  padding: 1rem;
+  padding-bottom: 2rem;
+}
+
+.profile-header {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  padding: 2rem 1rem;
+  text-align: center;
+  flex-direction: column;
+}
+
+.profile-avatar {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid var(--primary);
+}
+
+.profile-name {
+  font-size: 1.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.profile-menu {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+  margin: 1rem 0 2rem;
+}
+
+.menu-item {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1.2rem;
+  background: rgba(255, 255, 255, 0.8);
+  border-radius: 15px;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.dark-mode .menu-item {
+  background: rgba(34, 40, 49, 0.8);
+}
+
+.menu-item:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow);
+}
+
+.menu-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  background: rgba(108, 92, 231, 0.1);
+  color: var(--primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.logout-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.8rem 1.5rem;
+  background: transparent;
+  border: 1px solid #e74c3c;
+  color: #e74c3c;
+  border-radius: 30px;
+  margin: 0 auto;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.logout-btn:hover {
+  background: #e74c3c;
+  color: white;
+}
+
+.footer-text {
+  text-align: center;
+  margin-top: 2rem;
+  color: #999;
+  font-size: 0.9rem;
+}
+
+.login-prompt {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 50vh;
+  gap: 1.5rem;
+}
+
+.login-btn {
+  padding: 0.8rem 2rem;
+  background: var(--primary);
+  color: white;
+  border-radius: 30px;
+  text-decoration: none;
+  transition: var(--transition);
+}
+
+.login-btn:hover {
+  background: #5a49d1;
+  transform: translateY(-2px);
+}

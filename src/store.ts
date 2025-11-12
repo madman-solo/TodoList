@@ -1,19 +1,16 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
-
 interface UserState {
-  user: { id: string; name: string } | null;
+  user: {
+    id: string;
+    name: string;
+    avatar?: string;
+    email?: string;
+  } | null;
   login: (userData: { id: string; name: string }) => void;
   logout: () => void;
   isAuthenticated: boolean;
 }
-
-// interface ThemeState {
-//   isDarkMode: boolean;
-//   toggleDarkMode: () => void;
-//   background: string;
-//   setBackground: (bg: string) => void;
-// }
 
 interface ThemeState {
   isDarkMode: boolean;
@@ -54,18 +51,6 @@ export const useUserStore = create<UserState>()(
     { name: "user-storage" }
   )
 );
-
-// export const useThemeStore = create<ThemeState>()(
-//   persist(
-//     (set) => ({
-//       isDarkMode: false,
-//       background: "default",
-//       toggleDarkMode: () => set((state) => ({ isDarkMode: !state.isDarkMode })),
-//       setBackground: (bg) => set({ background: bg }),
-//     }),
-//     { name: "theme-storage" }
-//   )
-// );
 
 export const useThemeStore = create<ThemeState>()(
   persist(
