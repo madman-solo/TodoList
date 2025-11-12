@@ -20,7 +20,7 @@
 //     children: [
 //       { index: true, element: <Home /> },
 //       { path: "background", element: <BackgroundSelector /> },
-//       { path: "view", element: <ViewSettings /> }, // 新增视图路由
+// { path: "view", element: <ViewSettings /> }, // 新增视图路由
 // {
 //   path: "profile", // 新增我的路由
 //   element: <Profile />,
@@ -62,12 +62,14 @@ import WishList from "./pages/couple/WishList.tsx";
 import TableStyle from "./pages/couple/TableStyle.tsx";
 import CoupleGames from "./pages/couple/CoupleGames.tsx";
 import Profile from "./pages/Profile.tsx";
+import ViewSettings from "./pages/ViewSettings.tsx";
 const router = createBrowserRouter([
   {
     path: "/",
     element: <Layout />,
     children: [
       { index: true, element: <Home /> },
+      { path: "view", element: <ViewSettings /> }, // 新增视图路由
       {
         path: "background",
         element: <BackgroundSelector />,

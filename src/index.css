@@ -663,14 +663,14 @@ body {
   padding: 1rem;
 }
 
-.page-header h1 {
-  font-family: "Playfair Display", serif;
+.page-header h6 {
+  font-family: "Playfair Display";
   font-size: 2.5rem;
   margin-bottom: 0.5rem;
   background: linear-gradient(45deg, var(--primary), var(--secondary));
   -webkit-background-clip: text;
   background-clip: text;
-  color: transparent;
+  color: #1c031a;
 }
 
 .header-subtitle {

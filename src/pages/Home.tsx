@@ -40,7 +40,7 @@ const Home = () => {
         {/* 右侧待办区域 */}
 
         <div className="page-header">
-          <h1>我的待办清单</h1>
+          <h6>我的待办清单</h6>
           <p className="header-subtitle">记录每一个重要时刻</p>
         </div>
 

@@ -50,8 +50,8 @@ const container = (isDarkMode: boolean) => css`
 const pageTitle = css`
   text-align: center;
   margin-bottom: 2rem;
-  font-family: "Playfair Display", serif;
-  color: #6c5ce7;
+  font-family: "Playfair Display";
+  color: #7f72cfff;
 `;
 
 const settingCard = css`
