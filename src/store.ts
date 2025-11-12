@@ -8,11 +8,20 @@ interface UserState {
   isAuthenticated: boolean;
 }
 
+// interface ThemeState {
+//   isDarkMode: boolean;
+//   toggleDarkMode: () => void;
+//   background: string;
+//   setBackground: (bg: string) => void;
+// }
+
 interface ThemeState {
   isDarkMode: boolean;
   toggleDarkMode: () => void;
   background: string;
   setBackground: (bg: string) => void;
+  font: string; // 新增字体设置
+  setFont: (font: string) => void; // 新增设置字体方法
 }
 
 interface TodoState {
@@ -46,13 +55,27 @@ export const useUserStore = create<UserState>()(
   )
 );
 
+// export const useThemeStore = create<ThemeState>()(
+//   persist(
+//     (set) => ({
+//       isDarkMode: false,
+//       background: "default",
+//       toggleDarkMode: () => set((state) => ({ isDarkMode: !state.isDarkMode })),
+//       setBackground: (bg) => set({ background: bg }),
+//     }),
+//     { name: "theme-storage" }
+//   )
+// );
+
 export const useThemeStore = create<ThemeState>()(
   persist(
     (set) => ({
       isDarkMode: false,
       background: "default",
+      font: "poppins", // 默认字体
       toggleDarkMode: () => set((state) => ({ isDarkMode: !state.isDarkMode })),
       setBackground: (bg) => set({ background: bg }),
+      setFont: (font) => set({ font }), // 新增方法
     }),
     { name: "theme-storage" }
   )
