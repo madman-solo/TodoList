@@ -49,12 +49,12 @@ const router = createBrowserRouter([
         path: "profile", // 新增我的路由
         element: <Profile />,
         children: [
+          //问题：登录和注册页面路由变化，但是页面没有跳转？
           { path: "login", element: <Login /> }, // 登录作为子路由
           { path: "register", element: <Register /> }, // 注册作为子路由
         ],
       },
-      { path: "login", element: <Login /> }, //todo:为什么路由可以重复引用？
-      { path: "register", element: <Register /> },
+      { path: "login", element: <Login /> },
     ],
   },
 ]);
