@@ -7,6 +7,7 @@ import { useThemeStore } from "../store";
 const Register = () => {
   const { isDarkMode } = useThemeStore();
   const [name, setName] = useState("");
+  const [email] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const { login } = useUserStore();
@@ -19,7 +20,7 @@ const Register = () => {
       return;
     }
     // 实际应用中这里应该有API调用
-    login({ id: Date.now().toString(), name });
+    login({ id: Date.now().toString(), name, email });
     navigate("/");
   };
 

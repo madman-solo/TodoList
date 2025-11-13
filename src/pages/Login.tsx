@@ -6,6 +6,7 @@ import { useThemeStore } from "../store";
 const Login = () => {
   const { isDarkMode } = useThemeStore();
   const [name, setName] = useState("");
+  const [email] = useState("");
   const [password, setPassword] = useState("");
   const { login } = useUserStore();
   const navigate = useNavigate();
@@ -13,7 +14,7 @@ const Login = () => {
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
     // 实际应用中这里应该有API调用验证
-    login({ id: Date.now().toString(), name });
+    login({ id: Date.now().toString(), name, email });
     navigate("/");
   };
 

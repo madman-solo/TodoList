@@ -14,7 +14,7 @@ const navItems = [
 ];
 
 const BackgroundSelector = () => {
-  const [searchQuery, setSearchQuery] = useState("");
+  const [searchQuery] = useState("");
   // const handleSearchInput = (e: React.ChangeEvent<HTMLInputElement>) => {
   //   setSearchQuery(e.target.value);
   // };//这里后期添加搜索功能
