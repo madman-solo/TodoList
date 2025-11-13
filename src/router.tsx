@@ -77,7 +77,14 @@ const router = createBrowserRouter([
     ],
   },
 ]);
-
+// // 临时添加：打印每次路由变化
+router.subscribe((state) => {
+  // RouterState does not have `matchedRoutes`; use `matches` if available.
+  // Cast to any to be safe with the router's runtime shape and avoid TS errors.
+  const matches = ((state as any).matches as Array<any>) || [];
+  const paths = matches.map((m: any) => m.route?.path ?? m.pathname);
+  console.log("当前匹配路由:", paths);
+});
 export default function AppRouter() {
   return <RouterProvider router={router} />;
 }
