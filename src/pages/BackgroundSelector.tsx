@@ -14,6 +14,16 @@ const navItems = [
 ];
 
 const BackgroundSelector = () => {
+  const [searchQuery, setSearchQuery] = useState("");
+  // const handleSearchInput = (e: React.ChangeEvent<HTMLInputElement>) => {
+  //   setSearchQuery(e.target.value);
+  // };//这里后期添加搜索功能
+
+  const handleSearch = () => {
+    // 这里只是示例，实际项目中会调用API
+    console.log("搜索内容:", searchQuery);
+    // 可以添加搜索逻辑，比如过滤内容或导航到搜索结果页
+  };
   const { isDarkMode } = useThemeStore();
   const navigate = useNavigate();
   const location = useLocation();
@@ -23,8 +33,11 @@ const BackgroundSelector = () => {
   // 处理导航激活状态
   const handleNavClick = (id: string) => {
     setActiveNav(id);
-    if (id === "daily") {
-      navigate("/daily"); // 跳转到每日精选独立页面
+    if (id === "/daily") {
+      navigate("daily"); // 跳转到每日精选独立页面
+    }
+    if (id === "recommend") {
+      navigate("/background");
     } else {
       navigate(`/background/${id}`);
     }
@@ -83,7 +96,15 @@ const BackgroundSelector = () => {
             type="text"
             placeholder="搜索主题、字体、背景..."
             className="search-input"
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                handleSearch();
+              }
+            }}
           />
+          <button className="search-btn" onClick={handleSearch}>
+            搜索
+          </button>
         </div>
 
         {/* 导航菜单 */}

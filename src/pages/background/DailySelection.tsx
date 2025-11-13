@@ -8,7 +8,7 @@ import {
   FaHome,
   FaArrowLeft,
 } from "react-icons/fa";
-import { useThemeStore } from "../store";
+import { useThemeStore } from "../../store";
 
 const dailyItems = [
   {

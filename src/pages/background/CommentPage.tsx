@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { FaArrowLeft, FaPaperPlane } from "react-icons/fa";
-import { useThemeStore } from "../store";
+import { useThemeStore } from "../../store";
 
 // 模拟评论数据
 const initialComments = [

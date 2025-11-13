@@ -41,10 +41,10 @@ const Profile = () => {
                 </button>
               ) : (
                 <>
-                  <Link to="login" css={authLink}>
+                  <Link to="/login" css={authLink}>
                     登录
                   </Link>
-                  <Link to="register" css={authLink}>
+                  <Link to="/register" css={authLink}>
                     注册
                   </Link>
                 </>
@@ -74,37 +74,37 @@ const Profile = () => {
               { name: "情侣模式", path: "/couple", icon: <FaCog size={18} /> },
               {
                 name: "偏好设置",
-                path: "/profile/settings",
+                path: "/settings",
                 icon: <FaCog size={18} />,
               },
               {
                 name: "推送提醒",
-                path: "/profile/notifications",
+                path: "/notifications",
                 icon: <FaCog size={18} />,
               },
               {
                 name: "日记",
-                path: "/profile/diary",
+                path: "/diary",
                 icon: <FaCog size={18} />,
               },
               {
                 name: "专注",
-                path: "/profile/focus",
+                path: "/focus",
                 icon: <FaCog size={18} />,
               },
               {
                 name: "生日",
-                path: "/profile/birthday",
+                path: "/birthday",
                 icon: <FaCog size={18} />,
               },
               {
                 name: "纪念日",
-                path: "/profile/anniversary",
+                path: "/anniversary",
                 icon: <FaCog size={18} />,
               },
               {
                 name: "课程表",
-                path: "/profile/schedule",
+                path: "/schedule",
                 icon: <FaCog size={18} />,
               },
             ].map((item) => (
