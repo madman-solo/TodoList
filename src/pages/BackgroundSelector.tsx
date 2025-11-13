@@ -34,15 +34,12 @@ const BackgroundSelector = () => {
   const handleNavClick = (id: string) => {
     setActiveNav(id);
     if (id === "daily") {
-      console.log("点击触发跳转，目标：/daily");
-
       navigate("/daily"); // 跳转到每日精选独立页面
-    }
-    if (id === "recommend") {
-      navigate(""); //从子路由跳转回父路由
+    } else if (id === "recommend") {
+      navigate(""); //跳转到当前路由的路径
     } else {
       navigate(`/background/${id}`);
-    }
+    } //注意条件语句的写法
   };
 
   // 点击更多按钮跳转到对应板块
