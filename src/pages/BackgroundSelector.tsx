@@ -33,8 +33,9 @@ const BackgroundSelector = () => {
   // 处理导航激活状态
   const handleNavClick = (id: string) => {
     setActiveNav(id);
-    if (id === "/daily") {
-      navigate("daily"); // 跳转到每日精选独立页面
+    console.log("点击触发跳转，目标：/daily");
+    if (id === "daily") {
+      navigate("/daily"); // 跳转到每日精选独立页面
     }
     if (id === "recommend") {
       navigate("/background");

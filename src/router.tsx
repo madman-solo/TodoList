@@ -26,6 +26,7 @@ import BackgroundContent from "./pages/background/BackgroundContent.tsx";
 import ThemePage from "./pages/background/ThemePage.tsx";
 import FontPage from "./pages/background/FontPage.tsx";
 import IconPage from "./pages/background/IconPage.tsx";
+
 const router = createBrowserRouter([
   {
     path: "/",
@@ -33,6 +34,18 @@ const router = createBrowserRouter([
     children: [
       { index: true, element: <Home /> },
       { path: "view", element: <ViewSettings /> }, // 新增视图路由
+      {
+        path: "background",
+        element: <BackgroundSelector />,
+        children: [
+          { index: true, element: <BackgroundSelector /> },
+          { path: "theme", element: <ThemePage /> },
+          { path: "font", element: <FontPage /> },
+          { path: "backgrounds", element: <BackgroundContent /> },
+          { path: "icon", element: <IconPage /> },
+          { path: "my", element: <MyPage /> },
+        ],
+      },
       { path: "daily", element: <DailySelection /> }, // 每日精选
       { path: "daily/comments", element: <CommentPage /> }, // 评论页面
       {
@@ -60,19 +73,7 @@ const router = createBrowserRouter([
         path: "profile", // 新增我的路由
         element: <Profile />,
       },
-      { path: "login", element: <Login /> },
-      {
-        path: "background",
-        element: <BackgroundSelector />,
-        children: [
-          { index: true, element: <BackgroundSelector /> },
-          { path: "theme", element: <ThemePage /> },
-          { path: "font", element: <FontPage /> },
-          { path: "backgrounds", element: <BackgroundContent /> },
-          { path: "icon", element: <IconPage /> },
-          { path: "my", element: <MyPage /> },
-        ],
-      },
+      // { path: "login", element: <Login /> },
     ],
   },
 ]);
