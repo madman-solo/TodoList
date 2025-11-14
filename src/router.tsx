@@ -26,6 +26,7 @@ import BackgroundContent from "./pages/background/BackgroundContent.tsx";
 import ThemePage from "./pages/background/ThemePage.tsx";
 import FontPage from "./pages/background/FontPage.tsx";
 import IconPage from "./pages/background/IconPage.tsx";
+import CreateBirthdayPage from "./pages/outermy/CreateBirthdayPage.tsx";
 
 const router = createBrowserRouter([
   {
@@ -72,7 +73,14 @@ const router = createBrowserRouter([
       {
         path: "profile", // 新增我的路由
         element: <Profile />,
+        // children: [
+        //  ,
+        // ],
       },
+      { path: "diary", element: <DiaryPage /> },
+      { path: "birthday", element: <BirthdayPage /> },
+      { path: "diary/create", element: <CreateDiaryPage /> },
+      { path: "birthday/create", element: <CreateBirthdayPage /> },
     ],
   },
 ]);
