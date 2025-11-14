@@ -52,7 +52,7 @@
 // };
 
 // export default CreateDiaryPage;
-
+import { FaShareAlt } from "react-icons/fa";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import {
@@ -97,7 +97,7 @@ const CreateDiaryPage = () => {
         title: title.trim() || "无标题笔记",
         content: content.trim(),
         date: new Date().toISOString(),
-        coverImage,
+        coverImage: coverImage || undefined,
       };
 
       const savedDiaries = localStorage.getItem("diaries") || "[]";
@@ -114,7 +114,7 @@ const CreateDiaryPage = () => {
       title: title.trim() || "无标题笔记",
       content: content.trim(),
       date: new Date().toISOString(),
-      coverImage,
+      coverImage: coverImage || undefined,
     };
 
     const savedDiaries = localStorage.getItem("diaries") || "[]";
