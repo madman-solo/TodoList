@@ -69,7 +69,7 @@ body {
   top: 0;
   z-index: 100;
   border-radius: 0 0 15px 15px;
-  margin-bottom: 2rem;
+  margin-bottom: 0.2rem;
 }
 
 .dark-mode .main-nav {
@@ -1573,4 +1573,188 @@ body {
 
 .confirm-btn:hover {
   background: #5a49d1;
+}
+
+/* 通用内容页面样式 */
+.content-page {
+  padding-top: 2rem; /* 顶部导航高度 */
+  padding-bottom: 50px; /* 底部导航高度 */
+  min-height: 100vh;
+}
+
+/* 轮播模块通用样式 */
+.carousel-module {
+  margin-bottom: 2rem;
+  overflow: hidden;
+  position: relative;
+  border-radius: 15px;
+  box-shadow: var(--shadow);
+}
+
+.horizontal-carousel {
+  display: flex;
+  transition: transform 0.5s ease;
+}
+
+.carousel-slide {
+  min-width: 100%;
+  padding: 2rem;
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  color: white;
+  text-align: center;
+}
+
+.carousel-slide h3 {
+  font-size: 1.8rem;
+  margin-bottom: 1rem;
+  font-family: "Playfair Display", serif;
+}
+
+.carousel-slide p {
+  max-width: 600px;
+  margin: 0 auto;
+  opacity: 0.9;
+}
+
+/* 导航模块通用样式 */
+.nav-module {
+  display: flex;
+  gap: 0.8rem;
+  padding: 0 1rem 1rem;
+  overflow-x: auto;
+  margin-bottom: 1.5rem;
+  scrollbar-width: none;
+}
+
+.nav-module::-webkit-scrollbar {
+  display: none;
+}
+
+.nav-btn {
+  padding: 0.6rem 1.2rem;
+  border: none;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.8);
+  font-weight: 500;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.dark-mode .nav-btn {
+  background: rgba(57, 62, 70, 0.8);
+}
+
+.nav-btn:hover,
+.nav-btn.active {
+  background: var(--primary);
+  color: white;
+}
+
+.sort-btn {
+  padding: 0.6rem 1.2rem;
+  border: none;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.8);
+  font-weight: 500;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: var(--transition);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-left: auto;
+}
+
+.dark-mode .sort-btn {
+  background: rgba(57, 62, 70, 0.8);
+}
+
+.sort-btn:hover {
+  background: var(--primary);
+  color: white;
+}
+
+/* 内容网格通用样式 */
+.content-module {
+  padding: 0 1rem;
+}
+
+.vertical-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 1.5rem;
+}
+
+.horizontal-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 1.5rem;
+}
+
+.vertical-card {
+  background: rgba(255, 255, 255, 0.8);
+  border-radius: 15px;
+  overflow: hidden;
+  box-shadow: var(--shadow);
+  transition: var(--transition);
+  cursor: pointer;
+}
+
+.dark-mode .vertical-card,
+.dark-mode .horizontal-card {
+  background: rgba(34, 40, 49, 0.8);
+}
+
+.vertical-card:hover,
+.horizontal-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+}
+
+.vertical-card img {
+  width: 100%;
+  aspect-ratio: 4/3;
+  object-fit: cover;
+}
+
+.vertical-card span {
+  display: block;
+  padding: 1rem;
+  text-align: center;
+  font-weight: 500;
+}
+
+.horizontal-card {
+  background: rgba(255, 255, 255, 0.8);
+  border-radius: 15px;
+  padding: 1.5rem;
+  box-shadow: var(--shadow);
+  transition: var(--transition);
+  cursor: pointer;
+  text-align: center;
+}
+
+/* 响应式调整 */
+@media (max-width: 768px) {
+  .carousel-slide h3 {
+    font-size: 1.5rem;
+  }
+
+  .vertical-grid,
+  .horizontal-grid {
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    gap: 1rem;
+  }
+
+  .horizontal-card {
+    padding: 1rem;
+  }
+}
+
+@media (min-width: 1200px) {
+  .content-module {
+    max-width: 1200px;
+    margin: 0 auto;
+  }
 }

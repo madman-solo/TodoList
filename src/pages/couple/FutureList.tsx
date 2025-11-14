@@ -406,9 +406,9 @@ const redHeart = css`
   position: relative;
   width: 240px;
   height: 240px;
-  background-color: #e74c3c; /* 正红色 */
+  background-color: #cd1500ff; /* 正红色 */
   transform: rotate(-45deg) scale(1);
-  box-shadow: 0 0 30px rgba(231, 76, 60, 0.7);
+  box-shadow: 0 0 30px rgba(244, 88, 71, 0.7);
   z-index: 1;
   animation: heartbeat 1.5s infinite ease-in-out; /* 跳动动画 */
 
@@ -418,7 +418,7 @@ const redHeart = css`
     position: absolute;
     width: 240px;
     height: 240px;
-    background-color: #e74c3c;
+    background-color: #cd1500ff;
     border-radius: 50%;
   }
 
@@ -435,12 +435,19 @@ const redHeart = css`
   /* 响应式调整 */
   @media (max-width: 768px) {
     width: 180px;
-    height: 160px;
+    height: 180px;
+    transform: rotate(-45deg);
+    position: relative;
+    background-color: #cd1500ff; /* 正红色 */
 
     &::before,
     &::after {
+      content: ""; /* 必须添加，伪元素才会显示 */
+      position: absolute; /* 绝对定位 */
       width: 180px;
       height: 180px;
+      border-radius: 50%;
+      background-color: #cd1500ff; /* 正红色 */
     }
 
     &::before {
@@ -519,26 +526,26 @@ const inputStyle = css`
 
 const addButton = css`
   padding: 0 1rem;
-  background: #e74c3c;
-  color: white;
+  background: #cd1500ff;
+  color: #333;
   border: none;
   border-radius: 8px;
   cursor: pointer;
   transition: background 0.3s;
 
   &:hover {
-    background: #c0392b;
+    background: #d56154ff;
   }
 `;
 
 const itemCard = () => css`
   position: absolute;
-  background: white;
+  background: #000000ff;
   border-radius: 8px;
-  padding: 0.8rem;
+  padding: 0.5rem;
   box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
-  width: 120px;
-  min-height: 60px;
+  width: 100px;
+  min-height: 30px;
   transform: rotate(${(Math.random() - 0.5) * 10}deg); /* 修复类型不匹配问题 */
   transition: all 0.3s;
   z-index: 2;

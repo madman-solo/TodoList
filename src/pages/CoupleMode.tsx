@@ -96,11 +96,11 @@ const navLink = (isActive: boolean) => css`
   border-radius: 4px;
   color: #333;
   font-weight: 500;
-  background: ${isActive ? "#ffccd5" : "transparent"};
+  background: ${isActive ? "#fff6f7ff" : "transparent"};
   transition: all 0.3s;
 
   &:hover {
-    background: #ffccd5;
+    background: #fff3f5ff;
   }
 `;
 
