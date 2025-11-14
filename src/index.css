@@ -658,11 +658,26 @@ body {
 
 /* 首页标题样式 */
 .page-header {
-  text-align: center;
-  margin: 2rem 0;
-  padding: 1rem;
+  display: flex;
+  align-items: center;
+  padding: 1rem 5%;
+  /* padding: 1rem; */
+  border-bottom: 1px solid #eee;
 }
+.page-header h2 {
+  margin: 0 auto; /* 左右自动外边距，实现居中 */
+  font-size: 1.2rem; /* 适配手机端的字体大小 */
+}
+/* 响应式优化（确保在小屏幕上同样生效） */
+@media (max-width: 768px) {
+  .page-header {
+    padding: 0.8rem 3%; /* 手机端减小内边距 */
+  }
 
+  .page-header h2 {
+    font-size: 1.1rem; /* 手机端字体稍小 */
+  }
+}
 .page-header h6 {
   font-family: "Playfair Display";
   font-size: 2.5rem;
@@ -1257,6 +1272,7 @@ body {
 }
 
 /* 创建日记页面样式 */
+
 .create-diary-page {
   height: 100vh;
   display: flex;
@@ -1470,4 +1486,105 @@ body {
     width: 36px;
     height: 36px;
   }
+}
+
+/* 日历弹窗样式 */
+.calendar-modal {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: white;
+  border-radius: 15px;
+  padding: 2rem;
+  width: 90%;
+  max-width: 400px;
+  z-index: 1000;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+}
+
+.dark-mode .calendar-modal {
+  background: #2d3436;
+}
+
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 999;
+}
+
+/* 响应式调整 */
+@media (max-width: 768px) {
+  .diary-header {
+    padding: 0.8rem 5%;
+  }
+
+  .diary-content {
+    padding: 1.5rem 5%;
+  }
+
+  .create-btn {
+    width: 50px;
+    height: 50px;
+    right: 1.5rem;
+    bottom: 75px;
+  }
+
+  .calendar-modal {
+    padding: 1.5rem;
+  }
+}
+/* 日记时间选择器样式 */
+.calendar-btn {
+  background: transparent;
+  border: none;
+  color: inherit;
+  cursor: pointer;
+  padding: 0.5rem;
+  border-radius: 8px;
+  transition: background 0.3s;
+}
+
+.calendar-btn:hover {
+  background: rgba(0, 0, 0, 0.05);
+}
+
+.dark-mode .calendar-btn:hover {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.calendar-modal input[type="date"] {
+  width: 100%;
+  padding: 0.8rem;
+  margin: 1rem 0;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+  background: #f9f9f9;
+  font-size: 1rem;
+}
+
+.dark-mode .calendar-modal input[type="date"] {
+  background: #444;
+  border-color: #555;
+  color: white;
+}
+
+.confirm-btn {
+  width: 100%;
+  padding: 0.8rem;
+  background: var(--primary);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: background 0.3s;
+}
+
+.confirm-btn:hover {
+  background: #5a49d1;
 }
