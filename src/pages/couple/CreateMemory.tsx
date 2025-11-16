@@ -31,6 +31,8 @@ const CreateMemory = () => {
 
   // 返回相册首页
   const goBack = () => {
+    // console.log("fanhui");
+
     navigate("/couple/memories");
   };
 

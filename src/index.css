@@ -1000,6 +1000,7 @@ body {
   margin-right: 1rem;
   cursor: pointer;
   color: inherit;
+  z-index: 9999 !important;
 }
 
 .comments-list {
@@ -1360,7 +1361,7 @@ body {
 .options-modal li:hover {
   background: #f5f5f5;
 }
-
+/* 生日弹窗遮罩 */
 .overlay {
   position: fixed;
   top: 0;
@@ -1368,7 +1369,7 @@ body {
   right: 0;
   bottom: 0;
   background: rgba(0, 0, 0, 0.5);
-  z-index: 999;
+  z-index: 200;
 }
 
 /* 生日页面样式 */
@@ -1500,7 +1501,7 @@ body {
   right: 0;
   bottom: 0;
   background: rgba(0, 0, 0, 0.5);
-  z-index: 999;
+  z-index: 200;
 }
 
 /* 响应式调整 */
@@ -1994,7 +1995,7 @@ body {
   border-radius: 10px;
   width: 90%;
   max-width: 300px;
-  z-index: 100;
+  z-index: 300;
 }
 
 .create-folder-modal input {
@@ -2034,4 +2035,7 @@ body {
   .albums-grid {
     grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
   }
+}
+.options-btn {
+  z-index: 9999 !important;
 }
