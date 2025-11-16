@@ -64,6 +64,12 @@ const CoupleMode = () => {
         <Link to="wish" css={navLink(location.pathname.endsWith("wish"))}>
           心愿清单
         </Link>
+        <Link
+          to="memories"
+          css={navLink(location.pathname.endsWith("memories"))}
+        >
+          回忆相册
+        </Link>
         <Link to="games" css={navLink(location.pathname.endsWith("games"))}>
           情侣小游戏
         </Link>

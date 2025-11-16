@@ -27,6 +27,9 @@ import ThemePage from "./pages/background/ThemePage.tsx";
 import FontPage from "./pages/background/FontPage.tsx";
 import IconPage from "./pages/background/IconPage.tsx";
 import CreateBirthdayPage from "./pages/outermy/CreateBirthdayPage.tsx";
+import MemoriesAlbum from "./pages/couple/MemoriesAlbum.tsx";
+import CreateMemory from "./pages/couple/CreateMemory.tsx";
+import SelectFolder from "./pages/couple/SelectFolder.tsx";
 
 const router = createBrowserRouter([
   {
@@ -57,6 +60,9 @@ const router = createBrowserRouter([
           { path: "table", element: <TableStyle /> },
           { path: "wish", element: <WishList /> },
           { path: "games", element: <CoupleGames /> },
+          { path: "memories", element: <MemoriesAlbum /> },
+          { path: "memories/create", element: <CreateMemory /> },
+          { path: "memories/folders", element: <SelectFolder /> },
         ],
       },
       { path: "login", element: <Login /> }, // 登录作为子路由
@@ -73,9 +79,6 @@ const router = createBrowserRouter([
       {
         path: "profile", // 新增我的路由
         element: <Profile />,
-        // children: [
-        //  ,
-        // ],
       },
       { path: "diary", element: <DiaryPage /> },
       { path: "birthday", element: <BirthdayPage /> },
