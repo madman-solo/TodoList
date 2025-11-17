@@ -2,7 +2,6 @@ import { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { FaArrowLeft, FaPlus } from "react-icons/fa";
 import { useThemeStore } from "../../store";
-
 interface Folder {
   id: string;
   name: string;
@@ -37,7 +36,7 @@ const SelectFolder = () => {
 
   // 返回创建相册页面
   const goBack = () => {
-    navigate("/couple/memories/create");
+    navigate(`/memories/create?albumId=${albumId}`);
   };
 
   // 选择文件夹
@@ -53,7 +52,7 @@ const SelectFolder = () => {
     );
     localStorage.setItem("memories", JSON.stringify(updatedAlbums));
 
-    navigate("/couple/memories/create");
+    navigate(`/memories/create?albumId=${albumId}`);
   };
 
   // 创建新文件夹
@@ -68,9 +67,14 @@ const SelectFolder = () => {
     const updatedFolders = [...folders, newFolder];
     setFolders(updatedFolders);
     localStorage.setItem("memoryFolders", JSON.stringify(updatedFolders));
+    const upfolder = localStorage.getItem("memoryFolders");
+    console.log(upfolder);
+    // 存了一个
 
     setShowCreateFolder(false);
     setNewFolderName("文件夹");
+    selectFolder(newFolder.id);
+    navigate(`/memories/create?albumId=${albumId}`);
   };
 
   return (

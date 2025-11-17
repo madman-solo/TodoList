@@ -58,13 +58,13 @@ const router = createBrowserRouter([
         children: [
           { index: true, element: <FutureList /> },
           { path: "table", element: <TableStyle /> },
-          { path: "wish", element: <WishList /> },
           { path: "games", element: <CoupleGames /> },
-          { path: "memories", element: <MemoriesAlbum /> },
-          { path: "memories/create", element: <CreateMemory /> },
-          { path: "memories/folders", element: <SelectFolder /> },
         ],
       },
+      { path: "wish", element: <WishList /> },
+      { path: "memories", element: <MemoriesAlbum /> },
+      { path: "memories/create", element: <CreateMemory /> },
+      { path: "memories/folders", element: <SelectFolder /> },
       { path: "login", element: <Login /> }, // 登录作为子路由
       { path: "register", element: <Register /> }, // 注册作为子路由
       // todo:我的页面中的登录和注册不能跳转到新页面，需要作为子路由处理，不满足我的需求

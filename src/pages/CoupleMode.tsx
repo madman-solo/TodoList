@@ -61,11 +61,11 @@ const CoupleMode = () => {
         >
           未来清单
         </Link>
-        <Link to="wish" css={navLink(location.pathname.endsWith("wish"))}>
+        <Link to="/wish" css={navLink(location.pathname.endsWith("wish"))}>
           心愿清单
         </Link>
         <Link
-          to="memories"
+          to="/memories"
           css={navLink(location.pathname.endsWith("memories"))}
         >
           回忆相册

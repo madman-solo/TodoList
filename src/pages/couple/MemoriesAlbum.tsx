@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { FaPlus, FaSearch } from "react-icons/fa";
 import { useThemeStore } from "../../store";
-
+// todo:点击文件夹出现对应的相册
 // 定义相册类型
 interface Album {
   id: string;
@@ -31,6 +31,8 @@ const MemoriesAlbum = () => {
   // 从本地存储加载数据
   useEffect(() => {
     const savedFolders = localStorage.getItem("memoryFolders");
+    console.log(folders);
+    //渲染了两次?还疑惑中
     const savedAlbums = localStorage.getItem("memories");
 
     if (savedFolders) {
@@ -52,8 +54,11 @@ const MemoriesAlbum = () => {
   });
 
   const goToCreateAlbum = () => {
-    navigate("/couple/memories/create");
+    navigate("/memories/create");
   };
+  const realFolders = Array.from(
+    new Map(folders.map((item) => [item.id, item])).values()
+  );
 
   return (
     <div
@@ -75,7 +80,7 @@ const MemoriesAlbum = () => {
 
       {/* 第二个模块：文件夹导航 */}
       <div className="folders-nav">
-        {folders.map((folder) => (
+        {realFolders.map((folder) => (
           <button
             key={folder.id}
             className={`folder-btn ${
