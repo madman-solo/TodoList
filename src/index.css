@@ -2040,66 +2040,176 @@ body {
   z-index: 9999 !important;
 }
 
-/* 相册页面样式
-.album-page {
-  padding: 1rem;
-  height: 100vh;
-  box-sizing: border-box;
-}
-
-.folder-list {
+/* 加载和错误状态样式 */
+.loading-container,
+.error-container {
   display: flex;
-  gap: 1rem;
-  padding: 1rem 0;
-  overflow-x: auto;
-}
-
-.folder-item {
-  display: flex;
+  flex-direction: column;
   align-items: center;
-  gap: 0.5rem;
-  padding: 0.5rem 1rem;
-  border-radius: 8px;
-  background: transparent;
-  border: 1px solid #ddd;
+  justify-content: center;
+  min-height: 50vh;
+  gap: 1rem;
+}
+
+.spinner {
+  animation: spin 1s linear infinite;
+  color: var(--primary);
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.error-container button {
+  padding: 0.6rem 1.2rem;
+  background: var(--primary);
+  color: white;
+  border: none;
+  border-radius: 4px;
   cursor: pointer;
 }
 
-.folder-item.active {
-  background: var(--primary);
-  color: white;
-  border-color: var(--primary);
-}
-
-.albums-container {
-  margin-top: 1rem;
-  flex: 1;
-}
-
-.album-grid {
+/* 图标页面样式 */
+.grid-icons {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
   gap: 1rem;
 }
 
-.album-card {
+.icon-card {
   border-radius: 8px;
   overflow: hidden;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  background: rgba(255, 255, 255, 0.8);
+  box-shadow: var(--shadow);
+  transition: transform 0.3s;
 }
 
-.album-card img {
+.dark-mode .icon-card {
+  background: rgba(57, 62, 70, 0.8);
+}
+
+.icon-card:hover {
+  transform: translateY(-5px);
+}
+
+.icon-card img {
   width: 100%;
   height: 100px;
   object-fit: cover;
 }
 
-.default-cover {
-  width: 100%;
-  height: 100px;
-  background: #f0f0f0;
+.icon-info {
+  padding: 0.8rem;
+}
+
+.icon-name {
+  font-weight: 500;
+  display: block;
+  margin-bottom: 0.3rem;
+}
+
+.icon-count,
+.icon-formats {
+  font-size: 0.8rem;
+  color: #666;
+  display: block;
+}
+
+.dark-mode .icon-count,
+.dark-mode .icon-formats {
+  color: #bbb;
+}
+
+.download-btn {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  background: rgba(0, 0, 0, 0.5);
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 30px;
+  height: 30px;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #999;
-} */
+  cursor: pointer;
+}
+
+/* 徽章样式 */
+.new-badge,
+.premium-badge,
+.resolution-badge {
+  position: absolute;
+  top: 0.5rem;
+  left: 0.5rem;
+  padding: 0.2rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.7rem;
+  font-weight: 500;
+}
+
+.new-badge {
+  background: #4caf50;
+  color: white;
+}
+
+.premium-badge {
+  background: #ff9800;
+  color: white;
+}
+
+.resolution-badge {
+  background: rgba(0, 0, 0, 0.5);
+  color: white;
+}
+
+.selected-indicator {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: var(--primary);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+}
+
+/* 响应式调整 */
+@media (max-width: 768px) {
+  .grid-icons {
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  }
+
+  .carousel-slide h3 {
+    font-size: 1.5rem;
+  }
+
+  .content-module {
+    padding: 0 0.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .nav-module {
+    gap: 0.5rem;
+  }
+
+  .nav-btn {
+    padding: 0.4rem 0.8rem;
+    font-size: 0.8rem;
+  }
+
+  .grid-icons {
+    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+  }
+}
