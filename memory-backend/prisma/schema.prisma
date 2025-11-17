@@ -1,0 +1,87 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL") // SQLite数据库文件路径
+}
+
+// 用户表（存储登录信息）
+model User {
+  id        String   @id @default(uuid())
+  username  String   @unique // 用户名唯一
+  password  String   // 密码（实际项目需加密，这里简化）
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// 推荐内容表（首页推荐）
+model Recommend {
+  id          String   @id @default(uuid())
+  type        String   // 类型：theme/font/background/icon
+  itemId      String   // 关联的内容ID
+  priority    Int      // 优先级（排序用）
+  createdAt   DateTime @default(now())
+}
+
+// 主题表
+model Theme {
+  id            String   @id @default(uuid())
+  title         String
+  preview       String   // 预览图URL（可存本地路径或网络地址）
+  category      String   // 分类：简约/活力/专业等
+  downloadCount Int      @default(0) // 下载量
+  isNew         Boolean  @default(false)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+// 字体表
+model Font {
+  id          String   @id @default(uuid())
+  name        String
+  previewText String   // 预览文字
+  category    String   // 分类：书法/个性/手写等
+  url         String   // 字体CSS链接（如Google Fonts）
+  isPremium   Boolean  @default(false) // 是否会员字体
+  createdAt   DateTime @default(now())
+}
+
+// 背景表
+model Background {
+  id         String   @id @default(uuid())
+  title      String
+  preview    String   // 预览图URL
+  category   String   // 分类：真人/动漫/插画等
+  resolution String   // 分辨率：1920x1080等
+  size       Int      // 文件大小（KB）
+  createdAt  DateTime @default(now())
+}
+
+// 图标表
+model Icon {
+  id        String   @id @default(uuid())
+  name      String
+  preview   String   // 预览图URL
+  category  String   // 分类：系统/社交/商务等
+  format    String // 格式：用逗号分隔 → "svg,png"
+  count     Int      // 图标数量
+  createdAt DateTime @default(now())
+}
+
+// 轮播图表
+model Carousel {
+  id        String   @id @default(uuid())
+  type      String   // 关联类型：theme/font等
+  title     String
+  desc      String
+  image     String?  // 图片URL
+  createdAt DateTime @default(now())
+}
