@@ -68,18 +68,6 @@ app.get("/api/backgrounds", async (req, res) => {
   }
 });
 
-// 5. 图标接口
-// app.get("/api/icons", async (req, res) => {
-//   try {
-//     const { category } = req.query;
-//     const icons = await prisma.icon.findMany({
-//       where: category && category !== "all" ? { category } : {},
-//     });
-//     res.json(icons);
-//   } catch (error) {
-//     res.status(500).json({ error: "获取图标失败" });
-//   }
-// });
 // 5.图标接口（修改后）
 app.get("/api/icons", async (req, res) => {
   try {
