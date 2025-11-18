@@ -19,7 +19,19 @@ app.get("/api/recommendations", async (req, res) => {
   try {
     // 从数据库查询各类推荐内容
     const themes = await prisma.theme.findMany({ take: 9 });
-    const fonts = await prisma.font.findMany({ take: 6 });
+    const fonts = await prisma.font.findMany({
+      take: 6,
+      select: {
+        id: true,
+        name: true,
+        isPremium: true,
+        previewText: true,
+        category: true,
+        createdAt: true,
+        url: true,
+        preview: true, // 必须显式选择preview字段
+      },
+    });
     const backgrounds = await prisma.background.findMany({ take: 9 });
     const icons = await prisma.icon.findMany({ take: 12 });
 
@@ -97,7 +109,15 @@ app.get("/api/carousel/:type", async (req, res) => {
     res.status(500).json({ error: "获取轮播图失败" });
   }
 });
-
+// 7.每日精选轮播图
+app.get("/api/dailyCarousel", async (req, res) => {
+  try {
+    const dailyItems = await prisma.daily.findMany(); // 从 daily 表查询数据
+    res.json(dailyItems);
+  } catch (err) {
+    res.status(500).json({ error: "获取每日精选失败" });
+  }
+});
 // 启动服务
 app.listen(PORT, () => {
   console.log(`后端接口运行在 http://localhost:${PORT}/api`);

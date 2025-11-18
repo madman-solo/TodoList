@@ -9,33 +9,38 @@ import {
   FaArrowLeft,
 } from "react-icons/fa";
 import { useThemeStore } from "../../store";
-
-const dailyItems = [
-  {
-    id: 1,
-    title: "极简主义主题",
-    type: "theme",
-    image: "/backgrounds/minimal.jpg",
-  },
-  {
-    id: 2,
-    title: "治愈系字体",
-    type: "font",
-    image: "/backgrounds/nature.jpg",
-  },
-  {
-    id: 3,
-    title: "城市夜景背景",
-    type: "background",
-    image: "/backgrounds/city.jpg",
-  },
-  {
-    id: 4,
-    title: "创意图标集",
-    type: "icon",
-    image: "/backgrounds/abstract.jpg",
-  },
-];
+import { backgroundAPI, type DailyItem } from "../../services/api";
+// todo:改成实时更新前后端交互，调用数据
+// todo:主题几个轮播图效果优化
+// Todo:点击推荐页面中的小盒子时跳转到相应页面
+// todo:实现背景更换，字体收藏下载，Icon下载
+// todo:以上都要做单人用户数据保存
+// const dailyItems = [
+//   {
+//     id: 1,
+//     title: "极简主义主题",
+//     type: "theme",
+//     image: "/backgrounds/minimal.jpg",
+//   },
+//   {
+//     id: 2,
+//     title: "治愈系字体",
+//     type: "font",
+//     image: "/backgrounds/nature.jpg",
+//   },
+//   {
+//     id: 3,
+//     title: "城市夜景背景",
+//     type: "background",
+//     image: "/backgrounds/city.jpg",
+//   },
+//   {
+//     id: 4,
+//     title: "创意图标集",
+//     type: "icon",
+//     image: "/backgrounds/abstract.jpg",
+//   },
+// ];
 
 const DailySelection = () => {
   const { isDarkMode } = useThemeStore();
@@ -45,6 +50,7 @@ const DailySelection = () => {
   const [liked, setLiked] = useState(false);
   const [startX, setStartX] = useState(0); // 记录触摸起始位置
   const carouselRef = useRef<HTMLDivElement>(null);
+  const [dailyItems, setDailylItems] = useState<DailyItem[]>([]);
 
   // 处理触摸开始（React 合成事件）
   const handleTouchStart = (e: React.TouchEvent<HTMLDivElement>) => {
@@ -64,7 +70,19 @@ const DailySelection = () => {
       setActiveIndex((prev) => prev - 1);
     }
   };
+  // 获取轮播数据
+  useEffect(() => {
+    const fetchCarousel = async () => {
+      try {
+        const data = await backgroundAPI.getDailyCarousel();
+        setDailylItems(data);
+      } catch (err) {
+        console.error("获取轮播数据失败:", err);
+      }
+    };
 
+    fetchCarousel();
+  }, []);
   // 自动滚动到当前激活项
   useEffect(() => {
     if (carouselRef.current) {

@@ -5,9 +5,18 @@ const API_BASE_URL =
 // 请求工具函数
 const request = async <T>(
   endpoint: string,
-  options: RequestInit = {}
+  options: RequestInit & {
+    params?: Record<string, string | number | boolean>;
+  } = {}
 ): Promise<T> => {
-  const url = `${API_BASE_URL}${endpoint}`;
+  let url = `${API_BASE_URL}${endpoint}`;
+  if (options.params) {
+    const searchParams = new URLSearchParams();
+    Object.entries(options.params).forEach(([key, value]) => {
+      searchParams.append(key, String(value));
+    });
+    url += `?${searchParams.toString()}`;
+  }
 
   try {
     const response = await fetch(url, {
@@ -44,44 +53,48 @@ export const backgroundAPI = {
   getThemes: (category?: string) =>
     request<ThemeItem[]>("/themes", {
       method: "GET",
-      headers: {
-        Category: category || "all",
-      },
+      params: { category: category || "all" },
     }),
 
   // 获取字体列表
   getFonts: (category?: string) =>
     request<FontItem[]>("/fonts", {
       method: "GET",
-      headers: {
-        Category: category || "all",
-      },
+      params: { category: category || "all" },
     }),
 
   // 获取背景列表
   getBackgrounds: (category?: string) =>
     request<BackgroundItem[]>("/backgrounds", {
       method: "GET",
-      headers: {
-        Category: category || "all",
-      },
+      params: { category: category || "all" },
     }),
 
   // 获取图标列表
   getIcons: (category?: string) =>
     request<IconItem[]>("/icons", {
       method: "GET",
-      headers: {
-        Category: category || "all",
-      },
+      // headers: {
+      //   Category: category || "all",
+      // },
+      params: { category: category || "all" },
     }),
 
   // 获取轮播内容
   getCarousel: (type: "theme" | "font" | "background" | "icon" | "recommend") =>
     request<CarouselItem[]>(`/carousel/${type}`),
+
+  // 获取每日精选内容：
+  getDailyCarousel: () => request<DailyItem[]>(`/dailyCarousel`),
 };
 
 // 数据类型定义
+export interface DailyItem {
+  id: number;
+  title: string;
+  type: string;
+  image?: string;
+}
 export interface CarouselItem {
   id: number;
   title: string;

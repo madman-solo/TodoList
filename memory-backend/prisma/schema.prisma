@@ -47,7 +47,8 @@ model Theme {
 model Font {
   id          String   @id @default(uuid())
   name        String
-  previewText     String   // 预览文字
+  previewText String   // 预览文字
+  preview     String   @default("")   //预览图URL（可存本地路径或网络地址）并添加默认值
   category    String   // 分类：书法/个性/手写等
   url         String   // 字体CSS链接（如Google Fonts）
   isPremium   Boolean  @default(false) // 是否会员字体
@@ -84,4 +85,11 @@ model Carousel {
   desc      String
   image     String?  // 图片URL
   createdAt DateTime @default(now())
+}
+//每日精选轮播图
+model Daily{
+  id       String   @id @default(uuid())
+  type      String   // 关联类型：theme/font等
+  title     String
+  image     String?  // 图片URL
 }

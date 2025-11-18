@@ -211,6 +211,7 @@ const BackgroundSelector = () => {
         setLoading(true);
         const data = await backgroundAPI.getRecommendations();
         setRecommendations(data);
+        console.log("字体数据:", recommendations.fonts);
         setError("");
       } catch (err) {
         setError("加载推荐内容失败，请稍后重试");
