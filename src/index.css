@@ -1579,8 +1579,8 @@ body {
 /* 通用内容页面样式 */
 .content-page {
   padding-top: 2rem; /* 顶部导航高度 */
-  padding-bottom: 50px; /* 底部导航高度 */
-  min-height: 100vh;
+  /* padding-bottom: 50px; 底部导航高度 */
+  min-height: 20vh;
 }
 
 /* 轮播模块通用样式 */
@@ -2211,5 +2211,55 @@ body {
 
   .grid-icons {
     grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+  }
+}
+
+/* 在原有样式基础上添加 */
+.content-module.vertical-grid {
+  position: relative;
+  z-index: 10; /* 确保卡片在动画之上 */
+}
+
+.vertical-card {
+  transition: all 0.3s ease;
+}
+
+.vertical-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+}
+
+@media (max-width: 768px) {
+  .content-module.vertical-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+  }
+
+  .carousel-module {
+    height: 200px;
+  }
+
+  .nav-module {
+    flex-wrap: wrap;
+    padding: 0 0.5rem;
+  }
+
+  .nav-btn {
+    flex: 1 0 auto;
+    margin: 0.25rem;
+    padding: 0.5rem;
+    font-size: 0.8rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .sidebar {
+    max-width: 85%;
+  }
+}
+/* 针对侧边栏遮罩的移动端适配 */
+@media (max-width: 768px) {
+  .sidebar-overlay {
+    background: rgba(0, 0, 0, 0.3) !important;
   }
 }

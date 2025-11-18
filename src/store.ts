@@ -1,25 +1,5 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
-// interface UserState {
-//   user: {
-//     id: string;
-//     name: string;
-//     avatar?: string;
-//     email?: string;
-//   } | null;
-//   login: (userData: { id: string; name: string }) => void;
-//   logout: () => void;
-//   isAuthenticated: boolean;
-// }
-
-// interface ThemeState {
-//   isDarkMode: boolean;
-//   toggleDarkMode: () => void;
-//   background: string;
-//   setBackground: (bg: string) => void;
-//   font: string; // 新增字体设置
-//   setFont: (font: string) => void; // 新增设置字体方法
-// }
 
 interface TodoState {
   todos: {
@@ -39,32 +19,6 @@ interface TodoState {
   ) => void;
   initialPosition: (id: number, position: { x: number; y: number }) => void;
 }
-
-// export const useUserStore = create<UserState>()(
-//   persist(
-//     (set) => ({
-//       user: null,
-//       isAuthenticated: false,
-//       login: (userData) => set({ user: userData, isAuthenticated: true }),
-//       logout: () => set({ user: null, isAuthenticated: false }),
-//     }),
-//     { name: "user-storage" }
-//   )
-// );
-
-// export const useThemeStore = create<ThemeState>()(
-//   persist(
-//     (set) => ({
-//       isDarkMode: false,
-//       background: "default",
-//       font: "poppins", // 默认字体
-//       toggleDarkMode: () => set((state) => ({ isDarkMode: !state.isDarkMode })),
-//       setBackground: (bg) => set({ background: bg }),
-//       setFont: (font) => set({ font }), // 新增方法
-//     }),
-//     { name: "theme-storage" }
-//   )
-// );
 
 export const useTodoStore = create<TodoState>()(
   persist(
@@ -118,10 +72,6 @@ export const useTodoStore = create<TodoState>()(
     { name: "todo-storage" }
   )
 );
-
-// // src/store.ts (添加用户数据存储逻辑)
-// import { create } from "zustand";
-// import { persist } from "zustand/middleware";
 
 interface User {
   id: string;

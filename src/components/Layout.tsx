@@ -14,6 +14,7 @@ const Layout: FC = () => {
         backgroundImage: `url(/backgrounds/${background}.jpg)`,
         backgroundSize: "cover",
         backgroundAttachment: "fixed",
+        backgroundPosition: "center",
         minHeight: "100vh",
       }}
     >
