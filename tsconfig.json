@@ -3,5 +3,18 @@
   "references": [
     { "path": "./tsconfig.app.json" },
     { "path": "./tsconfig.node.json" }
-  ]
+  ],
+  "compilerOptions": {
+    "jsx": "react-jsx",
+    "jsxImportSource": "@emotion/react",
+    "types": [
+      "@emotion/react/types/css-prop",
+      "@types/emoji-mart",
+      "react",
+      "react-dom"
+    ],
+    "moduleResolution": "NodeNext",
+    "allowSyntheticDefaultImports": true,
+    "typeRoots": ["./node_modules/@types", "./types"]
+  }
 }

@@ -30,6 +30,7 @@ import CreateBirthdayPage from "./pages/outermy/CreateBirthdayPage.tsx";
 import MemoriesAlbum from "./pages/couple/MemoriesAlbum.tsx";
 import CreateMemory from "./pages/couple/CreateMemory.tsx";
 import SelectFolder from "./pages/couple/SelectFolder.tsx";
+import { Myliked } from "./pages/intermy/Myfont.tsx";
 
 const router = createBrowserRouter([
   {

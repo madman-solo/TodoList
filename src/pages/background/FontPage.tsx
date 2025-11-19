@@ -1,5 +1,11 @@
 import { useState, useEffect } from "react";
-import { FaSort, FaSpinner } from "react-icons/fa";
+import {
+  FaSort,
+  FaSpinner,
+  FaHeart,
+  FaDownload,
+  FaCheck,
+} from "react-icons/fa";
 import { useThemeStore } from "../../store";
 import {
   backgroundAPI,
@@ -15,8 +21,8 @@ const fontCategories = [
   { id: "个人字体展", name: "个人字体展" },
   { id: "手写", name: "手写" },
 ];
-
 const FontPage = () => {
+  const { favoriteFonts, toggleFavoriteFont } = useThemeStore();
   const { isDarkMode } = useThemeStore();
   const [activeCarousel, setActiveCarousel] = useState(0);
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
@@ -25,7 +31,16 @@ const FontPage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [carouselItems, setCarouselItems] = useState<CarouselItem[]>([]);
+  // 判断字体是否已收藏
+  const isFavorite = (id: number) => {
+    return favoriteFonts.some((font) => font.id === id);
+  };
 
+  // 下载字体（示例方法，需根据实际需求实现）
+  const downloadFont = (font: FontItem) => {
+    console.log(`开始下载字体: ${font.name}, 下载地址: ${font.url}`);
+    // 实际项目中可调用下载接口或触发浏览器下载
+  };
   // 获取轮播数据
   useEffect(() => {
     const fetchCarousel = async () => {
@@ -118,6 +133,10 @@ const FontPage = () => {
     );
   }
 
+  // function isFavorite(id: number) {
+  //   throw new Error("Function not implemented.");
+  // }
+
   return (
     <div className={`content-page ${isDarkMode ? "dark-mode" : "light-mode"}`}>
       {/* 轮播模块 */}
@@ -175,6 +194,28 @@ const FontPage = () => {
             className="horizontal-card"
             style={{ fontFamily: font.name }}
           >
+            <div className="font-actions">
+              <button
+                className={`font-action-btn ${
+                  isFavorite(font.id) ? "active" : ""
+                }`}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  toggleFavoriteFont(font); // 调用 store 中的收藏方法
+                }}
+              >
+                {isFavorite(font.id) ? <FaCheck /> : <FaHeart />}
+              </button>
+              <button
+                className="font-action-btn"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  downloadFont(font); // 调用下载方法
+                }}
+              >
+                <FaDownload />
+              </button>
+            </div>
             <div style={{ fontSize: "1.5rem", marginBottom: "0.5rem" }}>Aa</div>
             <div>{font.name}</div>
             <div

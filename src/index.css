@@ -2263,3 +2263,88 @@ body {
     background: rgba(0, 0, 0, 0.3) !important;
   }
 }
+/* src/index.css 新增 */
+/* 首页和情侣模块居中布局 */
+.home-page,
+.couple-mode {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+
+/* 确保在各种屏幕尺寸下居中 */
+@media (max-width: 768px) {
+  .home-container,
+  .couple-mode {
+    padding: 0 0.5rem;
+  }
+}
+/* src/index.css 修改 */
+.horizontal-card {
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+  padding: 1.5rem;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.8);
+  box-shadow: var(--shadow);
+}
+
+.dark-mode .horizontal-card {
+  background: rgba(57, 62, 70, 0.8);
+}
+
+.horizontal-card:hover {
+  opacity: 0.9;
+  transform: translateY(-5px);
+}
+
+.font-actions {
+  position: absolute;
+  top: -40px; /* 初始隐藏 */
+  right: 10px;
+  display: flex;
+  gap: 0.5rem;
+  transition: top 0.3s ease;
+}
+
+.horizontal-card:hover .font-actions {
+  top: 10px; /* 悬停时显示 */
+}
+
+.font-action-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(255, 255, 255, 0.9);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+  transition: all 0.2s;
+}
+
+.font-action-btn:hover {
+  background: white;
+  transform: scale(1.1);
+}
+
+.font-action-btn.active {
+  color: var(--primary);
+}
+
+/* 响应式调整 */
+@media (max-width: 768px) {
+  .horizontal-grid {
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  }
+
+  .horizontal-card {
+    padding: 1rem;
+  }
+}

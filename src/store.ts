@@ -1,5 +1,6 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
+import type { FontItem } from "./services/api";
 
 interface TodoState {
   todos: {
@@ -86,6 +87,8 @@ interface ThemeState {
   setBackground: (bg: string) => void;
   font: string; // 新增字体设置
   setFont: (font: string) => void; // 新增设置字体方法
+  favoriteFonts: FontItem[]; // 收藏的字体列表
+  toggleFavoriteFont: (font: FontItem) => void; // 切换字体收藏状态
 }
 
 interface UserState {
@@ -145,6 +148,21 @@ export const useThemeStore = create<ThemeState>()(
       toggleDarkMode: () => set((state) => ({ isDarkMode: !state.isDarkMode })),
       setBackground: (bg) => set({ background: bg }),
       setFont: (font) => set({ font }), // 新增方法
+      favoriteFonts: [],
+      toggleFavoriteFont: (font) => {
+        set((state) => {
+          const isFavorite = state.favoriteFonts.some((f) => f.id === font.id);
+          if (isFavorite) {
+            return {
+              favoriteFonts: state.favoriteFonts.filter(
+                (f) => f.id !== font.id
+              ),
+            };
+          } else {
+            return { favoriteFonts: [...state.favoriteFonts, font] };
+          }
+        });
+      },
     }),
     { name: "theme-storage" }
   )
