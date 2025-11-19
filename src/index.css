@@ -2264,8 +2264,8 @@ body {
   }
 }
 /* src/index.css 新增 */
-/* 首页和情侣模块居中布局 */
-.home-page,
+/* 情侣模块居中布局 */
+
 .couple-mode {
   display: flex;
   flex-direction: column;
@@ -2347,4 +2347,85 @@ body {
   .horizontal-card {
     padding: 1rem;
   }
+}
+/* mypage新增 */
+
+.menu-link {
+  text-decoration: none;
+  color: inherit;
+  display: block;
+}
+
+.menu-item {
+  display: flex;
+  align-items: center;
+  padding: 1rem;
+  border-bottom: 1px solid #eee;
+  transition: background-color 0.2s;
+}
+
+.dark-mode .menu-item {
+  border-bottom-color: #444;
+}
+
+.menu-item:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
+.menu-icon {
+  margin-right: 1rem;
+  width: 24px;
+  text-align: center;
+}
+/* 字体新增： */
+.horizontal-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 1.5rem;
+  padding: 1rem;
+}
+
+@media (max-width: 768px) {
+  .horizontal-grid {
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    gap: 1rem;
+  }
+}
+
+.horizontal-card {
+  background: white;
+  border-radius: 8px;
+  padding: 1rem;
+  text-align: center;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s;
+}
+
+.dark-mode .horizontal-card {
+  background: #2d2d2d;
+}
+
+.font-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.font-action-btn {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+
+.font-action-btn.active {
+  color: #e74c3c;
+  background-color: rgba(231, 76, 60, 0.1);
 }

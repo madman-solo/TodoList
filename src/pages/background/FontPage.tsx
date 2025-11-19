@@ -37,10 +37,18 @@ const FontPage = () => {
   };
 
   // 下载字体（示例方法，需根据实际需求实现）
+  // const downloadFont = (font: FontItem) => {
+  //   console.log(`开始下载字体: ${font.name}, 下载地址: ${font.url}`);
+  //   // 实际项目中可调用下载接口或触发浏览器下载
+  // };
   const downloadFont = (font: FontItem) => {
     console.log(`开始下载字体: ${font.name}, 下载地址: ${font.url}`);
-    // 实际项目中可调用下载接口或触发浏览器下载
+    // 添加到我的字体列表
+    useThemeStore.getState().addToMyFonts(font);
+    // 触发下载
+    useThemeStore.getState().downloadFont(font);
   };
+
   // 获取轮播数据
   useEffect(() => {
     const fetchCarousel = async () => {
@@ -133,10 +141,6 @@ const FontPage = () => {
     );
   }
 
-  // function isFavorite(id: number) {
-  //   throw new Error("Function not implemented.");
-  // }
-
   return (
     <div className={`content-page ${isDarkMode ? "dark-mode" : "light-mode"}`}>
       {/* 轮播模块 */}
@@ -201,7 +205,13 @@ const FontPage = () => {
                 }`}
                 onClick={(e) => {
                   e.stopPropagation();
-                  toggleFavoriteFont(font); // 调用 store 中的收藏方法
+                  toggleFavoriteFont(font);
+                  // 添加到点赞列表
+                  useThemeStore.getState().addToLiked({
+                    id: font.id,
+                    name: font.name,
+                    preview: font.preview || `/previews/font-${font.id}.jpg`, // 使用字体预览图
+                  });
                 }}
               >
                 {isFavorite(font.id) ? <FaCheck /> : <FaHeart />}

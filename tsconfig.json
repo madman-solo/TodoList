@@ -6,7 +6,8 @@
   ],
   "compilerOptions": {
     "jsx": "react-jsx",
-    "jsxImportSource": "@emotion/react",
+    "jsxImportSource": "@emotion/react", // 关键：指定 JSX 导入源为 Emotion
+
     "types": [
       "@emotion/react/types/css-prop",
       "@types/emoji-mart",
@@ -14,7 +15,13 @@
       "react-dom"
     ],
     "moduleResolution": "NodeNext",
+    "module": "NodeNext", // 关键：与 moduleResolution 保持一致
+
     "allowSyntheticDefaultImports": true,
-    "typeRoots": ["./node_modules/@types", "./types"]
+    "typeRoots": ["./node_modules/@types", "./types"],
+    "target": "ESNext",
+    // "module": "ESNext",
+    "esModuleInterop": true,
+    "strict": true
   }
 }

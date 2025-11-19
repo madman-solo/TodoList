@@ -30,8 +30,11 @@ import CreateBirthdayPage from "./pages/outermy/CreateBirthdayPage.tsx";
 import MemoriesAlbum from "./pages/couple/MemoriesAlbum.tsx";
 import CreateMemory from "./pages/couple/CreateMemory.tsx";
 import SelectFolder from "./pages/couple/SelectFolder.tsx";
-import { Myliked } from "./pages/intermy/Myfont.tsx";
-
+import MyThemes from "./pages/intermy/MyThemes.tsx";
+import MyFonts from "./pages/intermy/Myfonts.tsx";
+import MyLikes from "./pages/intermy/Mylikes.tsx";
+import MyBackgrounds from "./pages/intermy/Mybackgrounds.tsx";
+import MyCollections from "./pages/intermy/MyCollections.tsx";
 const router = createBrowserRouter([
   {
     path: "/",
@@ -49,6 +52,11 @@ const router = createBrowserRouter([
           { path: "backgrounds", element: <BackgroundContent /> },
           { path: "icon", element: <IconPage /> },
           { path: "my", element: <MyPage /> },
+          { path: "my/themes", element: <MyThemes /> },
+          { path: "my/fonts", element: <MyFonts /> },
+          { path: "my/likes", element: <MyLikes /> },
+          { path: "my/backgrounds", element: <MyBackgrounds /> },
+          { path: "my/collections", element: <MyCollections /> },
         ],
       },
       { path: "daily", element: <DailySelection /> }, // 每日精选

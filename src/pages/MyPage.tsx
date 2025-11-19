@@ -30,21 +30,35 @@ const MyPage = () => {
     );
   }
 
-  // 功能菜单
   const menuItems = [
     {
       icon: <FaImage size={20} />,
       name: "我的主题",
-      path: "/background/theme",
+      path: "/background/my/themes",
     },
-    { icon: <FaFont size={20} />, name: "我的字体" },
-    { icon: <FaImage size={20} />, name: "我的背景" },
-    { icon: <FaHeart size={20} />, name: "我的点赞" },
-    { icon: <FaBookmark size={20} />, name: "我的收藏" },
+    {
+      icon: <FaFont size={20} />,
+      name: "我的字体",
+      path: "/background/my/fonts",
+    },
+    {
+      icon: <FaImage size={20} />,
+      name: "我的背景",
+      path: "/background/my/backgrounds",
+    },
+    {
+      icon: <FaHeart size={20} />,
+      name: "我的点赞",
+      path: "/background/my/likes",
+    },
+    {
+      icon: <FaBookmark size={20} />,
+      name: "我的收藏",
+      path: "/background/my/collections",
+    },
     { icon: <FaShoppingCart size={20} />, name: "我的订单" },
     { icon: <FaCubes size={20} />, name: "模块混搭" },
   ];
-
   return (
     <div className={`my-page ${isDarkMode ? "dark-mode" : ""}`}>
       {/* 个人信息区域 */}
@@ -62,12 +76,20 @@ const MyPage = () => {
 
       {/* 功能菜单区域 */}
       <div className="profile-menu">
-        {menuItems.map((item, index) => (
+        {/* {menuItems.map((item, index) => (
           <div key={index} className="menu-item">
             <span className="menu-icon">{item.icon}</span>
             <span className="menu-text">{item.name}</span>
             {item.path && <Link to={item.path} className="menu-link" />}
           </div>
+        ))} */}
+        {menuItems.map((item, index) => (
+          <Link key={index} to={item.path || "#"} className="menu-link">
+            <div className="menu-item">
+              <span className="menu-icon">{item.icon}</span>
+              <span className="menu-text">{item.name}</span>
+            </div>
+          </Link>
         ))}
       </div>
 

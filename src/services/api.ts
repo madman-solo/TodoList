@@ -105,6 +105,7 @@ export interface CarouselItem {
 export interface ThemeItem {
   id: number;
   title: string;
+  name: string;
   preview: string;
   category: string;
   downloadCount: number;
@@ -124,6 +125,7 @@ export interface FontItem {
 export interface BackgroundItem {
   id: number;
   title: string;
+  name: string;
   preview: string;
   category: string;
   resolution: string;
