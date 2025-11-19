@@ -12,7 +12,7 @@ import {
   type FontItem,
   type CarouselItem,
 } from "../../services/api";
-
+import { css } from "@emotion/react";
 // 字体分类
 const fontCategories = [
   { id: "all", name: "全部" },
@@ -41,12 +41,79 @@ const FontPage = () => {
   //   console.log(`开始下载字体: ${font.name}, 下载地址: ${font.url}`);
   //   // 实际项目中可调用下载接口或触发浏览器下载
   // };
-  const downloadFont = (font: FontItem) => {
-    console.log(`开始下载字体: ${font.name}, 下载地址: ${font.url}`);
-    // 添加到我的字体列表
-    useThemeStore.getState().addToMyFonts(font);
-    // 触发下载
-    useThemeStore.getState().downloadFont(font);
+
+  // const downloadFont = (font: FontItem) => {
+  //   console.log(`开始下载字体: ${font.name}, 下载地址: ${font.url}`);
+  //   // 添加到我的字体列表
+  //   useThemeStore.getState().addToMyFonts(font);
+  //   // 触发下载
+  //   useThemeStore.getState().downloadFont(font);
+  // };
+  // 响应式下载提示组件
+  const DownloadToast = ({
+    visible,
+    message,
+  }: {
+    visible: boolean;
+    message: string;
+  }) => (
+    <div css={toastStyle(visible)}>
+      <p>{message}</p>
+    </div>
+  );
+  // 在组件中使用
+  const [toast, setToast] = useState({ visible: false, message: "" });
+
+  // 响应式提示框样式
+  const toastStyle = (visible: boolean) => css`
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%)
+      ${visible ? "translateY(0)" : "translateY(100px)"};
+    opacity: ${visible ? 1 : 0};
+    background: rgba(0, 0, 0, 0.8);
+    color: white;
+    padding: ${window.innerWidth < 768 ? "8px 16px" : "12px 24px"};
+    border-radius: 8px;
+    z-index: 9999;
+    font-size: ${window.innerWidth < 768 ? "14px" : "16px"};
+    transition: all 0.3s ease;
+    backdrop-filter: blur(4px);
+  `;
+
+  // 下载方法
+  const downloadFont = async (font: FontItem) => {
+    try {
+      // 验证URL是否为字体文件
+      const fontExts = ["ttf", "otf", "woff", "woff2"];
+      const ext = font.url.split(".").pop()?.toLowerCase();
+      if (!ext || !fontExts.includes(ext)) {
+        throw new Error("无效的字体文件格式");
+      }
+
+      // 使用Blob避免跨域跳转
+      const response = await fetch(font.url);
+      if (!response.ok) throw new Error("文件获取失败");
+      const blob = await response.blob();
+      const url = URL.createObjectURL(blob);
+
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = `${font.name}.${ext}`;
+      link.click();
+      URL.revokeObjectURL(url); // 释放资源
+
+      // 显示提示
+      setToast({ visible: true, message: `已下载: ${font.name}` });
+      setTimeout(() => setToast({ ...toast, visible: false }), 3000);
+    } catch (err) {
+      setToast({
+        visible: true,
+        message: `下载失败: ${err instanceof Error ? err.message : "未知错误"}`,
+      });
+      setTimeout(() => setToast({ ...toast, visible: false }), 3000);
+    }
   };
 
   // 获取轮播数据
@@ -236,9 +303,13 @@ const FontPage = () => {
             {font.isPremium && <span className="premium-badge">会员</span>}
           </div>
         ))}
+        <DownloadToast visible={toast.visible} message={toast.message} />
       </div>
     </div>
   );
 };
 
 export default FontPage;
+// function setToast(arg0: { visible: boolean; message: string; }) {
+//   throw new Error("Function not implemented.");
+// }

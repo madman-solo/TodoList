@@ -79,12 +79,16 @@ export const useTodoStore = create<TodoState>()(
     { name: "todo-storage" }
   )
 );
-
+// 定义用户需要持久化的数据：
+//todo:其他需要持久化的数据也要更改
 interface User {
   id: string;
   name: string;
   email: string;
   avatar?: string;
+  favorites?: { id: number; name: string }[];
+  settings?: { theme: string }; // 示例：用户设置
+  // 其他需要持久化的数据
 }
 interface ThemeState {
   isDarkMode: boolean;
@@ -144,6 +148,7 @@ export const useUserStore = create<UserState>()(
     }),
     {
       name: "user-storage", // 存储在localStorage中的键名
+      partialize: (state) => ({ user: state.user }), // 只持久化 user 数据
     }
   )
 );

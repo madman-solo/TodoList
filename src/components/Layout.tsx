@@ -19,11 +19,21 @@ const Layout: FC = () => {
       }}
     >
       <nav className="main-nav">
-        <Link to="/">首页</Link>
-        <Link to="/view">视图</Link>
-        <Link to="/background">背景</Link>
-        <Link to="/couple">情侣模式</Link>
-        <Link to="/profile">我的</Link>
+        <Link to="/" style={{ color: "#333333" }}>
+          首页
+        </Link>
+        <Link to="/view" style={{ color: "#333333" }}>
+          视图
+        </Link>
+        <Link to="/background" style={{ color: "#333333" }}>
+          背景
+        </Link>
+        <Link to="/couple" style={{ color: "#333333" }}>
+          情侣模式
+        </Link>
+        <Link to="/profile" style={{ color: "#333333" }}>
+          我的
+        </Link>
         <button onClick={toggleDarkMode} className="theme-toggle">
           {isDarkMode ? "日间模式" : "夜间模式"}
         </button>

@@ -3,8 +3,8 @@
 
 /* 基础样式重置与变量定义 */
 :root {
-  --primary: #6c5ce7;
-  --secondary: #fd79a8;
+  --primary: #484747;
+  --secondary: #e7a3bb;
   --accent: #ffeaa7;
   --dark: #2d3436;
   --light: #f8f9fa;
@@ -98,7 +98,7 @@ body {
   left: 0;
   width: 0;
   height: 2px;
-  background: var(--primary);
+  background: #46454b;
   transition: var(--transition);
 }
 
@@ -109,7 +109,7 @@ body {
 
 .main-nav a:hover,
 .main-nav button:hover {
-  color: var(--primary);
+  color: #46454b;
 }
 
 /* 卡片与容器样式 */
@@ -173,7 +173,7 @@ body {
 }
 
 .todo-input button:hover {
-  background: #5a49d1;
+  background: #f8833f;
   transform: translateY(-2px);
   box-shadow: 0 5px 15px rgba(108, 92, 231, 0.3);
 }
@@ -208,7 +208,7 @@ body {
 }
 
 .todo-item.completed {
-  border-left-color: #2ecc71;
+  border-left-color: #5fbb86;
   opacity: 0.8;
 }
 
@@ -234,7 +234,7 @@ body {
 }
 
 .delete-btn {
-  background: #ff6b6b;
+  background: #c36161;
   color: white;
 }
 
@@ -266,8 +266,9 @@ body {
 .background-selector h2 {
   text-align: center;
   margin-bottom: 2rem;
-  font-family: "Playfair Display", serif;
-  color: var(--primary);
+  font-size: 1.5rem;
+  /* font-family: "Playfair Display", serif; */
+  color: #393746;
 }
 
 .background-options {
@@ -365,7 +366,7 @@ body {
 }
 
 .auth-form button:hover {
-  background: #5a49d1;
+  background: #a093f8;
   transform: translateY(-2px);
   box-shadow: 0 5px 15px rgba(108, 92, 231, 0.3);
 }
@@ -780,6 +781,7 @@ body {
 
 .nav-item {
   padding: 0.6rem 1.2rem;
+  margin-top: 0.6rem;
   border: none;
   border-radius: 20px;
   background: transparent;
@@ -790,7 +792,7 @@ body {
 }
 
 .nav-item.selected {
-  background: var(--primary);
+  background: #8b75c1;
   color: white;
 }
 
@@ -1242,7 +1244,7 @@ body {
   width: 60px;
   height: 60px;
   border-radius: 50%;
-  background: var(--primary);
+  background: #eb9c3f;
   color: white;
   border: none;
   display: flex;
@@ -1648,7 +1650,7 @@ body {
 
 .nav-btn:hover,
 .nav-btn.active {
-  background: var(--primary);
+  background: #a498c4;
   color: white;
 }
 
@@ -1815,7 +1817,7 @@ body {
 }
 
 .folder-btn.active {
-  background: var(--primary);
+  background: #656565;
   color: white;
 }
 
@@ -1916,7 +1918,7 @@ body {
 }
 
 .save-album-btn {
-  background: var(--primary);
+  background: #f0a10f;
   color: white;
   border: none;
   padding: 0.8rem 2rem;
@@ -2037,7 +2039,11 @@ body {
   }
 }
 .options-btn {
-  z-index: 9999 !important;
+  z-index: 99 !important;
+  padding: 0.2rem;
+  border: none;
+  background-color: #f9f7ff;
+  cursor: pointer;
 }
 
 /* 加载和错误状态样式 */
@@ -2428,4 +2434,17 @@ body {
 .font-action-btn.active {
   color: #e74c3c;
   background-color: rgba(231, 76, 60, 0.1);
+}
+/* 搜索框 */
+.search-btn {
+  padding: 0.4rem 0.6rem;
+  margin-left: 0.1rem;
+  border: none;
+  border-radius: 20px;
+  background: #d6d6d6;
+  font-weight: 500;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: var(--transition);
+  color: rgb(77, 77, 77);
 }

@@ -133,7 +133,7 @@ const countStyle = (isDarkMode: boolean) => css`
 
 const backButtonStyle = css`
   padding: 0.5rem 1rem;
-  background-color: #007bff;
+  background-color: #4d7bacff;
   color: white;
   border: none;
   border-radius: 4px;
@@ -141,7 +141,7 @@ const backButtonStyle = css`
   transition: background-color 0.2s;
 
   &:hover {
-    background-color: #0056b3;
+    background-color: #112438ff;
   }
 
   @media (max-width: 768px) {

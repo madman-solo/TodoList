@@ -134,7 +134,7 @@ const inputStyle = css`
 
 const addButton = css`
   padding: 8px 16px;
-  background: #4f46e5;
+  background: #fea93aff;
   color: white;
   border: none;
   border-radius: 4px;
