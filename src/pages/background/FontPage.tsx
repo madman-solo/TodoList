@@ -13,7 +13,9 @@ import {
   type CarouselItem,
 } from "../../services/api";
 import { css } from "@emotion/react";
+
 // 字体分类
+
 const fontCategories = [
   { id: "all", name: "全部" },
   { id: "书法字体", name: "书法字体" },
@@ -31,24 +33,12 @@ const FontPage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [carouselItems, setCarouselItems] = useState<CarouselItem[]>([]);
+  // const { backgroundData } = useBackgroundContext();
   // 判断字体是否已收藏
   const isFavorite = (id: number) => {
     return favoriteFonts.some((font) => font.id === id);
   };
 
-  // 下载字体（示例方法，需根据实际需求实现）
-  // const downloadFont = (font: FontItem) => {
-  //   console.log(`开始下载字体: ${font.name}, 下载地址: ${font.url}`);
-  //   // 实际项目中可调用下载接口或触发浏览器下载
-  // };
-
-  // const downloadFont = (font: FontItem) => {
-  //   console.log(`开始下载字体: ${font.name}, 下载地址: ${font.url}`);
-  //   // 添加到我的字体列表
-  //   useThemeStore.getState().addToMyFonts(font);
-  //   // 触发下载
-  //   useThemeStore.getState().downloadFont(font);
-  // };
   // 响应式下载提示组件
   const DownloadToast = ({
     visible,
@@ -238,7 +228,12 @@ const FontPage = () => {
           </div>
         </div>
       )}
-
+      {/* <BackgroundAnimation
+        visible={true}
+        background={backgroundData.background || ""}
+        layers={backgroundData.layers}
+        onComplete={() => {}}
+      /> */}
       {/* 导航模块 */}
       <div className="nav-module">
         {fontCategories.map((category) => (

@@ -25,6 +25,15 @@ const BackgroundAnimation = ({
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [frame, setFrame] = useState(0);
   const totalFrames = 30; // 动画总帧数
+  useEffect(() => {
+    if (visible && onComplete) {
+      // 使用setTimeout避免在渲染过程中调用回调
+      const timer = setTimeout(() => {
+        onComplete();
+      }, 10);
+      return () => clearTimeout(timer);
+    }
+  }, [visible, onComplete]);
 
   useEffect(() => {
     if (!visible || !canvasRef.current) return;
@@ -115,7 +124,10 @@ const BackgroundAnimation = ({
 
       setFrame((prev) => {
         if (prev >= totalFrames) {
-          onComplete();
+          // onComplete();
+          setTimeout(() => {
+            onComplete();
+          }, 0);
           return totalFrames;
         }
         requestAnimationFrame(update);

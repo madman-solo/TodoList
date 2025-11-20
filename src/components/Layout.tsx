@@ -11,7 +11,10 @@ const Layout: FC = () => {
     <div
       className={isDarkMode ? "dark-mode" : "light-mode"}
       style={{
-        backgroundImage: `url(/backgrounds/${background}.jpg)`,
+        backgroundImage:
+          background && background !== "default"
+            ? `url(${background})`
+            : "none",
         backgroundSize: "cover",
         backgroundAttachment: "fixed",
         backgroundPosition: "center",

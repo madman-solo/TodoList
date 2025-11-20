@@ -1592,6 +1592,7 @@ body {
   position: relative;
   border-radius: 15px;
   box-shadow: var(--shadow);
+  z-index: 99;
 }
 
 .horizontal-carousel {

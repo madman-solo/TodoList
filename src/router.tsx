@@ -31,10 +31,11 @@ import MemoriesAlbum from "./pages/couple/MemoriesAlbum.tsx";
 import CreateMemory from "./pages/couple/CreateMemory.tsx";
 import SelectFolder from "./pages/couple/SelectFolder.tsx";
 import MyThemes from "./pages/intermy/MyThemes.tsx";
-import MyFonts from "./pages/intermy/Myfonts.tsx";
-import MyLikes from "./pages/intermy/Mylikes.tsx";
-import MyBackgrounds from "./pages/intermy/Mybackgrounds.tsx";
+import MyFonts from "./pages/intermy/MyFonts.tsx";
+import MyLikes from "./pages/intermy/MyLikes.tsx";
+import MyBackgrounds from "./pages/intermy/MyBackgrounds.tsx";
 import MyCollections from "./pages/intermy/MyCollections.tsx";
+import { BackgroundProvider } from "./components/BacgroundContext.tsx";
 const router = createBrowserRouter([
   {
     path: "/",
@@ -98,5 +99,11 @@ const router = createBrowserRouter([
 ]);
 
 export default function AppRouter() {
-  return <RouterProvider router={router} />;
+  return (
+    // {/* 全局提供背景数据 */}
+
+    <BackgroundProvider>
+      <RouterProvider router={router} />
+    </BackgroundProvider>
+  );
 }
