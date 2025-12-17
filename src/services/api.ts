@@ -1,12 +1,13 @@
 // 基础API配置
 const API_BASE_URL =
-  import.meta.env.VITE_API_URL || "http://localhost:3000/api";
+  import.meta.env.VITE_API_URL || "http://localhost:3001/api";
 
 // 请求工具函数
 const request = async <T>(
   endpoint: string,
   options: RequestInit & {
     params?: Record<string, string | number | boolean>;
+    requiresAuth?: boolean;
   } = {}
 ): Promise<T> => {
   let url = `${API_BASE_URL}${endpoint}`;
@@ -18,13 +19,30 @@ const request = async <T>(
     url += `?${searchParams.toString()}`;
   }
 
+  // 添加认证头
+  const headers: Record<string, string> = {
+    "Content-Type": "application/json",
+  };
+
+  if (options.headers) {
+    Object.entries(options.headers).forEach(([key, value]) => {
+      if (typeof value === "string") {
+        headers[key] = value;
+      }
+    });
+  }
+
+  if (options.requiresAuth) {
+    const token = localStorage.getItem("authToken");
+    if (token) {
+      headers["Authorization"] = `Bearer ${token}`;
+    }
+  }
+
   try {
     const response = await fetch(url, {
       ...options,
-      headers: {
-        "Content-Type": "application/json",
-        ...options.headers,
-      },
+      headers,
     });
 
     if (!response.ok) {
@@ -36,6 +54,96 @@ const request = async <T>(
     console.error(`请求${endpoint}失败:`, error);
     throw error;
   }
+};
+
+// 用户认证API
+export const authAPI = {
+  // 用户登录
+  login: (credentials: LoginCredentials) =>
+    request<LoginResponse>("/auth/login", {
+      method: "POST",
+      body: JSON.stringify(credentials),
+    }),
+
+  // 用户注册
+  register: (userData: RegisterData) =>
+    request<LoginResponse>("/auth/register", {
+      method: "POST",
+      body: JSON.stringify(userData),
+    }),
+};
+
+// 认证相关类型定义
+export interface LoginCredentials {
+  // id: number;
+  name: string;
+  // email: string;
+  password: string;
+}
+
+export interface RegisterData {
+  name: string;
+  // email: string;
+  password: string;
+}
+
+export interface LoginResponse {
+  token: string;
+  user: {
+    id: number;
+    name: string;
+    password: string;
+    // email: string;
+  };
+}
+
+export interface User {
+  id: number;
+  name: string;
+  password: string;
+  // email: string;
+}
+
+// 数据同步API
+interface SyncData {
+  myBackgrounds: BackgroundItem[];
+  myFonts: FontItem[];
+  myThemes: ThemeItem[];
+  likedItems: IconItem[];
+  favoriteFonts: FontItem[];
+  isDarkMode: boolean;
+  background: string;
+  font: string;
+}
+export const syncAPI = {
+  // 同步用户数据到云端
+  syncToCloud: (data: SyncData) =>
+    request<{ success: boolean }>("/sync/upload", {
+      method: "POST",
+      body: JSON.stringify(data),
+      requiresAuth: true,
+    }),
+
+  // 从云端获取用户数据
+  syncFromCloud: () =>
+    request<SyncData>("/sync/download", {
+      method: "GET",
+      requiresAuth: true,
+    }),
+
+  // 备份用户数据
+  backupData: () =>
+    request<{ backupId: string }>("/sync/backup", {
+      method: "POST",
+      requiresAuth: true,
+    }),
+
+  // 恢复用户数据
+  restoreData: (backupId: string) =>
+    request<SyncData>(`/sync/restore/${backupId}`, {
+      method: "POST",
+      requiresAuth: true,
+    }),
 };
 
 // 背景相关API
@@ -74,9 +182,6 @@ export const backgroundAPI = {
   getIcons: (category?: string) =>
     request<IconItem[]>("/icons", {
       method: "GET",
-      // headers: {
-      //   Category: category || "all",
-      // },
       params: { category: category || "all" },
     }),
 

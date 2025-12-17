@@ -15,6 +15,7 @@ import {
 const MyPage = () => {
   const { isDarkMode } = useThemeStore();
   const { user, isAuthenticated, logout } = useUserStore();
+  console.log(isAuthenticated);
 
   // 如果未登录，显示登录提示
   if (!isAuthenticated) {

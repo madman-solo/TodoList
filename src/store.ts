@@ -1,6 +1,7 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import type { FontItem, ThemeItem, BackgroundItem } from "./services/api";
+
 interface ItemBase {
   id: number;
   name: string;
@@ -76,20 +77,24 @@ export const useTodoStore = create<TodoState>()(
         set({ todos: newTodos });
       },
     }),
-    { name: "todo-storage" }
+    {
+      name: "todo-storage",
+    }
   )
 );
+
 // 定义用户需要持久化的数据：
-//todo:其他需要持久化的数据也要更改
 interface User {
-  id: string;
+  id: string | number;
   name: string;
-  email: string;
+  password: string;
+  email?: string;
   avatar?: string;
   favorites?: { id: number; name: string }[];
   settings?: { theme: string }; // 示例：用户设置
   // 其他需要持久化的数据
 }
+
 interface ThemeState {
   isDarkMode: boolean;
   toggleDarkMode: () => void;
@@ -116,6 +121,9 @@ interface ThemeState {
   removeBackground: (id: number) => void;
   downloadFont: (font: FontItem) => void;
   removeFavorite: (id: number) => void;
+
+  // 添加用于数据同步的方法
+  setState: (state: Partial<ThemeState>) => void;
 }
 
 interface UserState {
@@ -131,16 +139,21 @@ export const useUserStore = create<UserState>()(
     (set) => ({
       user: null,
       isAuthenticated: false,
-      login: (userData) =>
+      login: (userData) => {
         set({
           user: userData,
           isAuthenticated: true,
-        }),
-      logout: () =>
+        });
+      },
+      logout: () => {
+        // 登出时清除认证令牌和所有相关数据
+        localStorage.removeItem("authToken");
+        localStorage.removeItem("user-storage");
         set({
           user: null,
           isAuthenticated: false,
-        }),
+        });
+      },
       updateUser: (data) =>
         set((state) => ({
           user: state.user ? { ...state.user, ...data } : null,
@@ -148,10 +161,36 @@ export const useUserStore = create<UserState>()(
     }),
     {
       name: "user-storage", // 存储在localStorage中的键名
-      partialize: (state) => ({ user: state.user }), // 只持久化 user 数据
+      partialize: (state) => ({
+        user: state.user,
+        isAuthenticated: state.isAuthenticated,
+      }), // 持久化用户数据和认证状态
     }
   )
 );
+
+// 添加登录状态检查函数
+export const checkAuthStatus = () => {
+  const token = localStorage.getItem("authToken");
+  const userStorage = localStorage.getItem("user-storage");
+
+  if (!token || !userStorage) {
+    // 如果没有token或用户数据，清除所有认证信息
+    localStorage.removeItem("authToken");
+    localStorage.removeItem("user-storage");
+    return false;
+  }
+
+  try {
+    const userData = JSON.parse(userStorage);
+    return userData.state?.isAuthenticated || false;
+  } catch {
+    // 如果解析失败，清除所有认证信息
+    localStorage.removeItem("authToken");
+    localStorage.removeItem("user-storage");
+    return false;
+  }
+};
 
 // 添加任务数据存储
 interface Task {
@@ -167,6 +206,7 @@ interface TaskState {
   toggleTask: (userId: string, taskId: string) => void;
   deleteTask: (userId: string, taskId: string) => void;
 }
+
 export const useThemeStore = create<ThemeState>()(
   persist(
     (set) => ({
@@ -262,13 +302,9 @@ export const useThemeStore = create<ThemeState>()(
           myBackgrounds: state.myBackgrounds.filter((item) => item.id !== id),
         }));
       },
-      // todo:下载文件有问题，下载字体文件下载的应该是什么以及确保下载后返回原页面不会出现问题
-      // todo:能不能用cheerio以及puppeteer-core进行从网页爬取数据放进prisma数据库中，这里可以用于满足主题内容？或者icon?
-      // todo:所有单人用户登录之后存在保存的数据，在退出登录之后这些所有的保存的事件都会消失，用户再次登录时数据又会恢复。
-      // todo:背景内容更新以及数据库中未填的数据。
-      // todo:点击推荐页面中的小盒子之后会跳转到相应路由下的页面，同时该内容会显示特定状态。
-      // todo：背景更换时，是整个项目的背景都会变（这里应该会和星空起冲突，考虑是否去掉，更简约一点）
-      // todo:优化侧边栏样式，以及内层我的页面中的字体以及样式。
+
+      // 用于数据同步的方法
+      setState: (newState) => set(newState),
 
       // 下载字体并保存到本地
       downloadFont: (font) => {

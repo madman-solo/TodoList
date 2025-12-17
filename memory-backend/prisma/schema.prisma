@@ -10,16 +10,18 @@ generator client {
 
 datasource db {
   provider = "sqlite"
-  url      = env("DATABASE_URL") // SQLite数据库文件路径
+   url      = env("DATABASE_URL")
 }
 
 // 用户表（存储登录信息）
 model User {
-  id        String   @id @default(uuid())
-  username  String   @unique // 用户名唯一
-  password  String   // 密码（实际项目需加密，这里简化）
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id              String          @id @default(uuid())
+  name            String          @unique // 用户名唯一
+  password        String          // 密码（实际项目需加密，这里简化）
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+  sentRequests    CoupleRequest[] @relation("SentRequests")
+  receivedRequests CoupleRequest[] @relation("ReceivedRequests")
 }
 
 // 推荐内容表（首页推荐）
@@ -92,4 +94,43 @@ model Daily{
   type      String   // 关联类型：theme/font等
   title     String
   image     String?  // 图片URL
+}
+
+// 情侣关系表
+model CoupleRelation {
+  id        String        @id @default(uuid())
+  user1Id   String
+  user2Id   String
+  isActive  Boolean       @default(true)
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
+  events    CoupleEvent[]
+
+  @@unique([user1Id, user2Id])
+}
+
+// 情侣绑定请求表
+model CoupleRequest {
+  id         String   @id @default(uuid())
+  fromUserId String
+  toUserId   String
+  fromUser   User     @relation("SentRequests", fields: [fromUserId], references: [id], onDelete: Cascade)
+  toUser     User     @relation("ReceivedRequests", fields: [toUserId], references: [id], onDelete: Cascade)
+  createdAt  DateTime @default(now())
+
+  @@unique([fromUserId, toUserId])
+}
+
+// 情侣事件表
+model CoupleEvent {
+  id        String         @id @default(uuid())
+  content   String
+  type      String         // future/wish/memory
+  position  String?        // JSON字符串存储位置
+  completed Boolean        @default(false)
+  createdBy String
+  coupleId  String
+  couple    CoupleRelation @relation(fields: [coupleId], references: [id], onDelete: Cascade)
+  createdAt DateTime       @default(now())
+  updatedAt DateTime       @updatedAt
 }

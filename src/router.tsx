@@ -8,6 +8,8 @@ import CoupleMode from "./pages/CoupleMode.tsx";
 import Login from "./pages/Login.tsx";
 import Register from "./pages/Register";
 import Layout from "./components/Layout";
+import ProtectedRoute from "./components/ProtectedRoute";
+import CoupleRouteGuard from "./components/CoupleRouteGuard";
 import FutureList from "./pages/couple/FutureList.tsx";
 import WishList from "./pages/couple/WishList.tsx";
 import TableStyle from "./pages/couple/TableStyle.tsx";
@@ -36,10 +38,25 @@ import MyLikes from "./pages/intermy/MyLikes.tsx";
 import MyBackgrounds from "./pages/intermy/MyBackgrounds.tsx";
 import MyCollections from "./pages/intermy/MyCollections.tsx";
 import { BackgroundProvider } from "./components/BacgroundContext.tsx";
+
 const router = createBrowserRouter([
+  // 公开路由（不需要登录）
+  {
+    path: "/login",
+    element: <Login />,
+  },
+  {
+    path: "/register",
+    element: <Register />,
+  },
+  // 受保护的路由（需要登录）
   {
     path: "/",
-    element: <Layout />,
+    element: (
+      <ProtectedRoute>
+        <Layout />
+      </ProtectedRoute>
+    ),
     children: [
       { index: true, element: <Home /> },
       { path: "view", element: <ViewSettings /> }, // 新增视图路由
@@ -64,36 +81,45 @@ const router = createBrowserRouter([
       { path: "daily/comments", element: <CommentPage /> }, // 评论页面
       {
         path: "couple",
-        element: <CoupleMode />,
+        element: (
+          <CoupleRouteGuard>
+            <CoupleMode />
+          </CoupleRouteGuard>
+        ),
         children: [
           { index: true, element: <FutureList /> },
           { path: "table", element: <TableStyle /> },
           { path: "games", element: <CoupleGames /> },
         ],
       },
-      { path: "wish", element: <WishList /> },
-      { path: "memories", element: <MemoriesAlbum /> },
+      {
+        path: "wish",
+        element: (
+          <CoupleRouteGuard>
+            <WishList />
+          </CoupleRouteGuard>
+        ),
+      },
+      {
+        path: "memories",
+        element: (
+          <CoupleRouteGuard>
+            <MemoriesAlbum />
+          </CoupleRouteGuard>
+        ),
+      },
       { path: "memories/create", element: <CreateMemory /> },
       { path: "memories/folders", element: <SelectFolder /> },
-      { path: "login", element: <Login /> }, // 登录作为子路由
-      { path: "register", element: <Register /> }, // 注册作为子路由
-      // todo:我的页面中的登录和注册不能跳转到新页面，需要作为子路由处理，不满足我的需求
       { path: "focus", element: <FocusPage /> },
       { path: "notifications", element: <NotificationsPage /> },
       { path: "diary", element: <DiaryPage /> },
+      { path: "diary/create", element: <CreateDiaryPage /> },
       { path: "birthday", element: <BirthdayPage /> },
+      { path: "birthday/create", element: <CreateBirthdayPage /> },
       { path: "anniversary", element: <AnniversaryPage /> },
       { path: "schedule", element: <SchedulePage /> },
       { path: "settings", element: <PreferenceSettings /> },
-      { path: "create", element: <CreateDiaryPage /> },
-      {
-        path: "profile", // 新增我的路由
-        element: <Profile />,
-      },
-      { path: "diary", element: <DiaryPage /> },
-      { path: "birthday", element: <BirthdayPage /> },
-      { path: "diary/create", element: <CreateDiaryPage /> },
-      { path: "birthday/create", element: <CreateBirthdayPage /> },
+      { path: "profile", element: <Profile /> },
     ],
   },
 ]);

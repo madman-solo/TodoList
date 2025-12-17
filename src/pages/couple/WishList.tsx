@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { css } from "@emotion/react";
+import { Link } from "react-router-dom";
 
 const WishList = () => {
   // 左侧清单状态
@@ -28,6 +29,13 @@ const WishList = () => {
 
   return (
     <div css={container}>
+      {/* 返回情侣模式按钮 */}
+      <div css={backButtonContainer}>
+        <Link to="/couple" css={backButton}>
+          ← 返回情侣模式
+        </Link>
+      </div>
+
       {/* 上方 - 我的心愿（淡蓝色） */}
       <div css={wishBoxLeft}>
         <div css={inputSection}>
@@ -222,6 +230,31 @@ const wishItem = css`
   &:hover {
     box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
     transform: translateX(3px);
+  }
+`;
+
+const backButtonContainer = css`
+  margin-bottom: 1rem;
+`;
+
+const backButton = css`
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.8rem 1.5rem;
+  background: rgba(255, 255, 255, 0.9);
+  color: #333;
+  text-decoration: none;
+  border-radius: 25px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+  font-weight: 500;
+
+  &:hover {
+    background: rgba(108, 92, 231, 0.1);
+    color: #6c5ce7;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
   }
 `;
 

@@ -4,13 +4,10 @@ import { css } from "@emotion/react";
 import { useUserStore } from "../store";
 import { useThemeStore } from "../store";
 import { FaCog, FaQuestionCircle, FaInfoCircle } from "react-icons/fa";
-// import Login from "./Login";
-// import Register from "./Register";
 
 const Profile = () => {
   const { user, isAuthenticated, logout } = useUserStore();
   const { isDarkMode } = useThemeStore();
-  // const navigate = useNavigate();
 
   // 计算创建天数（示例）
   const creationDate = new Date();

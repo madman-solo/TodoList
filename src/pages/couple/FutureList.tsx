@@ -1,28 +1,74 @@
 /** @jsxImportSource @emotion/react */
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { css } from "@emotion/react";
+import { useCoupleStore } from "../../store/coupleStore";
+import type { CoupleEvent } from "../../store/coupleStore";
+import { useRealtimeCollaboration } from "../../hooks/useRealtimeCollaboration";
 
 const FutureList = () => {
-  // 从localStorage加载数据，实现持久化
-  const [items, setItems] = useState<string[]>(() => {
-    const saved = localStorage.getItem("couple_future_items");
-    return saved ? JSON.parse(saved) : [];
-  });
+  const {
+    events,
+    coupleRelation,
+    addEvent,
+    deleteEvent,
+    loadEvents,
+    setEvents,
+  } = useCoupleStore();
 
   const [newItem, setNewItem] = useState("");
   const [positions, setPositions] = useState<
-    Record<number, { x: number; y: number }>
-  >(() => {
-    const saved = localStorage.getItem("couple_future_positions");
-    return saved ? JSON.parse(saved) : {};
-  });
+    Record<string, { x: number; y: number }>
+  >({});
 
-  // 数据变化时保存到localStorage
+  // 获取未来清单类型的事件
+  const futureEvents = events.filter((event) => event.type === "future");
+
+  // 处理远程更新
+  const handleRemoteUpdate = useCallback(
+    (message: {
+      type: string;
+      data: CoupleEvent | { id: string };
+      action?: string;
+    }) => {
+      console.log("收到远程更新:", message);
+
+      if (message.action === "add" && message.data) {
+        setEvents([...events, message.data as CoupleEvent]);
+      } else if (message.action === "delete" && "id" in message.data) {
+        setEvents(events.filter((e) => e.id !== message.data.id));
+      }
+    },
+    [events, setEvents]
+  );
+
+  // 使用实时协作Hook
+  const { broadcastUpdate, isConnected } =
+    useRealtimeCollaboration<CoupleEvent>({
+      roomId: "future-list",
+      onRemoteUpdate: handleRemoteUpdate,
+      enabled: !!coupleRelation,
+    });
+
+  // 加载事件数据
   useEffect(() => {
-    localStorage.setItem("couple_future_items", JSON.stringify(items));
-    localStorage.setItem("couple_future_positions", JSON.stringify(positions));
-  }, [items, positions]);
+    if (coupleRelation) {
+      loadEvents();
+    }
+  }, [coupleRelation, loadEvents]);
+
+  // 初始化位置
+  useEffect(() => {
+    const newPositions: Record<string, { x: number; y: number }> = {};
+    futureEvents.forEach((event) => {
+      if (event.position) {
+        newPositions[event.id] = event.position;
+      } else if (!positions[event.id]) {
+        newPositions[event.id] = generateUniquePosition();
+      }
+    });
+    setPositions((prev) => ({ ...prev, ...newPositions }));
+  }, [futureEvents.length]);
 
   // 生成不重叠的位置
   const generateUniquePosition = () => {
@@ -67,19 +113,45 @@ const FutureList = () => {
     };
   };
 
-  const handleAddItem = () => {
-    if (newItem.trim()) {
-      const newItems = [...items, newItem.trim()];
-      setItems(newItems);
-      setNewItem("");
+  const handleAddItem = async () => {
+    if (newItem.trim() && coupleRelation) {
+      try {
+        const newPos = generateUniquePosition();
+        const newEvent = await addEvent({
+          content: newItem.trim(),
+          type: "future",
+          createdBy: 0, // 将由后端设置
+          position: newPos,
+        });
 
-      // 为新添加的项目生成唯一位置
-      const lastIndex = newItems.length - 1;
-      const newPos = generateUniquePosition();
-      setPositions((prev) => ({ ...prev, [lastIndex]: newPos }));
+        // 立即设置新事件的位置
+        setPositions((prev) => ({
+          ...prev,
+          [newEvent.id]: newPos,
+        }));
 
-      // 自动扩展容器高度
-      expandContainerIfNeeded();
+        setNewItem("");
+
+        // 广播添加事件
+        broadcastUpdate({ type: "future-list", data: newEvent, action: "add" });
+      } catch (error) {
+        console.error("添加事件失败:", error);
+      }
+    }
+  };
+
+  const handleDeleteItem = async (eventId: string) => {
+    try {
+      await deleteEvent(eventId);
+
+      // 广播删除事件
+      broadcastUpdate({
+        type: "future-list",
+        data: { id: eventId } as unknown as CoupleEvent,
+        action: "delete",
+      });
+    } catch (error) {
+      console.error("删除事件失败:", error);
     }
   };
 
@@ -89,23 +161,16 @@ const FutureList = () => {
     if (!container) return;
 
     // 当项目数量超过12个时开始扩展容器高度
-    if (items.length > 12) {
-      const extraHeight = Math.ceil((items.length - 12) / 4) * 100;
+    if (futureEvents.length > 12) {
+      const extraHeight = Math.ceil((futureEvents.length - 12) / 4) * 100;
       container.style.minHeight = `${400 + extraHeight}px`;
     }
   };
 
-  // 初始化位置和容器高度
+  // 监听事件变化，扩展容器
   useEffect(() => {
-    if (items.length && Object.keys(positions).length === 0) {
-      const initialPositions: Record<number, { x: number; y: number }> = {};
-      items.forEach((_, index) => {
-        initialPositions[index] = generateUniquePosition();
-      });
-      setPositions(initialPositions);
-    }
     expandContainerIfNeeded();
-  }, [items]);
+  }, [futureEvents.length]);
 
   return (
     <div css={container}>
@@ -129,17 +194,27 @@ const FutureList = () => {
           </button>
         </div>
       </div>
+
+      {/* 连接状态指示器 */}
+      <div css={connectionStatus}>
+        <span css={statusIndicator(isConnected())}>
+          {isConnected() ? "● 已连接" : "○ 未连接"}
+        </span>
+      </div>
+
       {/* 随机分布的小卡片 */}
-      {items.map((item, index) => (
+      {futureEvents.map((event) => (
         <div
-          key={index}
+          key={event.id}
           css={itemCard}
           style={{
-            top: `${positions[index]?.y}%`,
-            left: `${positions[index]?.x}%`,
+            top: `${positions[event.id]?.y}%`,
+            left: `${positions[event.id]?.x}%`,
           }}
+          onClick={() => handleDeleteItem(event.id)}
+          title="点击删除"
         >
-          {item}
+          {event.content}
         </div>
       ))}
     </div>
@@ -154,7 +229,7 @@ const heartContainer = css`
   display: flex;
   justify-content: center;
   align-items: flex-end; /* 让内容靠下，为爱心尖底留空间 */
-  margin: 2rem 0;
+  margin: auto;
   padding: 2rem;
 `;
 
@@ -237,22 +312,7 @@ const keyframes = css`
     }
   }
 `;
-// // 斜放的输入框容器
-// const inputContainer = css`
-//   position: absolute;
-//   z-index: 2;
-//   transform: rotate(-15deg) translate(120px, 20px); /* 斜放效果 */
-//   display: flex;
-//   gap: 0.5rem;
-//   width: 80%;
-//   max-width: 300px;
 
-//   /* 移动端调整角度和位置 */
-//   @media (max-width: 768px) {
-//     transform: rotate(-10deg) translate(80px, 10px);
-//     width: 70%;
-//   }
-// `;
 // 输入框置于爱心尖底
 const inputContainer = css`
   ${keyframes} /* 引入动画 */
@@ -324,6 +384,26 @@ const container = css`
   width: 100%;
   padding: 2rem 1rem;
   min-height: 100vh;
+`;
+
+const connectionStatus = css`
+  position: fixed;
+  top: 1rem;
+  right: 1rem;
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.9);
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  z-index: 100;
+  font-size: 0.9rem;
+`;
+
+const statusIndicator = (isConnected: boolean) => css`
+  color: ${isConnected ? "#4caf50" : "#f44336"};
+  font-weight: 500;
 `;
 
 export default FutureList;
