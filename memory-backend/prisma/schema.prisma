@@ -18,6 +18,7 @@ model User {
   id              String          @id @default(uuid())
   name            String          @unique // 用户名唯一
   password        String          // 密码（实际项目需加密，这里简化）
+  avatar          String?         // 头像（Base64或URL）
   createdAt       DateTime        @default(now())
   updatedAt       DateTime        @updatedAt
   sentRequests    CoupleRequest[] @relation("SentRequests")

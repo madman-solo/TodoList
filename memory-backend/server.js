@@ -138,6 +138,56 @@ io.on("connection", (socket) => {
     }
   });
 });
+
+// 引入必要的模块
+app.use(express.json()); // 确保解析JSON请求体
+
+// 存储绑定请求的内存数据库（假设已存在）
+const coupleBindings = new Map();
+
+// 处理绑定请求的接受/拒绝
+app.put("/api/couple/bind/:requestId", (req, res) => {
+  try {
+    const { requestId } = req.params;
+    const { accept } = req.body;
+    const currentUserId = req.headers["x-user-id"];
+
+    // 1. 验证必要参数
+    if (typeof accept !== "boolean") {
+      return res.status(400).json({ error: "参数错误：accept必须为布尔值" });
+    }
+    if (!currentUserId) {
+      return res.status(401).json({ error: "未提供用户身份信息" });
+    }
+
+    // 2. 查找绑定请求
+    const bindingRequest = coupleBindings.get(requestId);
+    if (!bindingRequest) {
+      return res.status(404).json({ error: "绑定请求不存在" });
+    }
+
+    // 3. 验证请求接收者身份（必须是被请求方）
+    if (bindingRequest.partnerId !== currentUserId) {
+      return res.status(403).json({ error: "无权处理此请求" });
+    }
+
+    // 4. 更新绑定状态
+    bindingRequest.status = accept ? "accepted" : "rejected";
+    bindingRequest.updatedAt = new Date().toISOString();
+    coupleBindings.set(requestId, bindingRequest);
+
+    // 5. 成功响应
+    res.status(200).json(bindingRequest);
+  } catch (error) {
+    // 捕获所有异常，避免返回500错误
+    console.error("处理绑定请求失败:", error);
+    res.status(500).json({
+      error: "服务器处理失败",
+      details:
+        process.env.NODE_ENV === "development" ? error.message : undefined,
+    });
+  }
+});
 // 认证相关接口模拟实现：
 // 用户注册
 app.post("/api/auth/register", async (req, res) => {
@@ -163,6 +213,7 @@ app.post("/api/auth/register", async (req, res) => {
       data: {
         name,
         password, // 实际项目中应该使用bcrypt等工具加密
+        avatar: null, // 【修复】初始化头像为null
       },
     });
 
@@ -173,7 +224,12 @@ app.post("/api/auth/register", async (req, res) => {
 
     res.json({
       token,
-      user: { id: user.id, name: user.name, password: user.password },
+      user: {
+        id: user.id,
+        name: user.name,
+        password: user.password,
+        avatar: user.avatar, // 【修复】返回头像字段
+      },
     });
   } catch (error) {
     console.error("注册错误:", error);
@@ -191,9 +247,15 @@ app.post("/api/auth/login", async (req, res) => {
       return res.status(400).json({ error: "用户名和密码不能为空" });
     }
 
-    // 查找用户
+    // 查找用户（包含头像字段）
     const user = await prisma.user.findUnique({
       where: { name },
+      select: {
+        id: true,
+        name: true,
+        password: true,
+        avatar: true, // 【修复】登录时加载头像
+      },
     });
 
     // 简单验证
@@ -209,7 +271,12 @@ app.post("/api/auth/login", async (req, res) => {
 
     res.json({
       token,
-      user: { id: user.id, name: user.name, password: user.password },
+      user: {
+        id: user.id,
+        name: user.name,
+        password: user.password,
+        avatar: user.avatar, // 【修复】返回头像数据
+      },
     });
   } catch (error) {
     console.error("登录错误:", error);
@@ -320,6 +387,60 @@ app.get("/api/dailyCarousel", async (req, res) => {
     res.status(500).json({ error: "获取每日精选失败" });
   }
 });
+// 获取用户信息接口
+app.get("/api/users/:userId", async (req, res) => {
+  try {
+    const { userId } = req.params;
+
+    // 【修复】查找用户（支持字符串UUID）
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      select: {
+        id: true,
+        name: true,
+        avatar: true,
+      },
+    });
+
+    if (!user) {
+      return res.status(404).json({ error: "用户不存在" });
+    }
+
+    res.json(user);
+  } catch (error) {
+    console.error("获取用户信息失败:", error);
+    res.status(500).json({ error: "获取用户信息失败" });
+  }
+});
+
+// 更新用户头像接口
+app.put("/api/users/:userId/avatar", async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const { avatar } = req.body;
+
+    if (!avatar) {
+      return res.status(400).json({ error: "头像数据不能为空" });
+    }
+
+    // 【修复】更新用户头像（支持字符串UUID）
+    const updatedUser = await prisma.user.update({
+      where: { id: userId },
+      data: { avatar },
+      select: {
+        id: true,
+        name: true,
+        avatar: true,
+      },
+    });
+
+    res.json(updatedUser);
+  } catch (error) {
+    console.error("更新用户头像失败:", error);
+    res.status(500).json({ error: "更新用户头像失败" });
+  }
+});
+
 // 情侣模式相关路由
 const coupleRoutes = require("./couple-routes");
 app.use("/api/couple", coupleRoutes);

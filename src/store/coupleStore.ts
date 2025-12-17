@@ -23,6 +23,7 @@ export interface CoupleRelation {
   partner?: {
     id: string;
     name: string;
+    avatar?: string; // 新增：对方头像字段
   };
 }
 
@@ -77,6 +78,7 @@ interface CoupleState {
   setEvents: (events: CoupleEvent[]) => void;
   setWsConnected: (connected: boolean) => void;
   clearCoupleData: () => void;
+  updatePartnerAvatar: (avatar: string) => void;
 }
 
 export const useCoupleStore = create<CoupleState>()(
@@ -122,6 +124,12 @@ export const useCoupleStore = create<CoupleState>()(
             });
             localStorage.setItem("coupleId", relation.id);
             localStorage.setItem("isCoupleBound", "true");
+
+            console.log("[loadCoupleRelation] 情侣关系已加载:", {
+              coupleId: relation.id,
+              partnerId: relation.partner?.id,
+              isCoupleBound: true,
+            });
           } else {
             set({
               coupleRelation: null,
@@ -131,6 +139,8 @@ export const useCoupleStore = create<CoupleState>()(
             });
             localStorage.removeItem("coupleId");
             localStorage.removeItem("isCoupleBound");
+
+            console.log("[loadCoupleRelation] 未找到情侣关系");
           }
         } catch (error) {
           console.error("加载情侣关系失败:", error);
@@ -164,6 +174,12 @@ export const useCoupleStore = create<CoupleState>()(
 
           const requests = await response.json();
           set({ pendingRequests: requests, isLoadingRequests: false });
+
+          console.log(
+            "[loadPendingRequests] 加载了",
+            requests.length,
+            "个待处理请求"
+          );
         } catch (error) {
           console.error("加载绑定请求失败:", error);
           set({ isLoadingRequests: false });
@@ -173,6 +189,8 @@ export const useCoupleStore = create<CoupleState>()(
       // 接受绑定请求 - BUG修复：接收方同意后设置绑定状态
       acceptRequest: async (requestId: string) => {
         try {
+          console.log("[acceptRequest] 开始接受请求:", requestId);
+
           const response = await fetch(
             "http://localhost:3001/api/couple/accept",
             {
@@ -186,10 +204,16 @@ export const useCoupleStore = create<CoupleState>()(
           );
 
           if (!response.ok) {
-            throw new Error("接受请求失败");
+            const errorData = await response.json().catch(() => ({}));
+            throw new Error(errorData.message || "接受请求失败");
           }
 
           const coupleRelation = await response.json();
+
+          // 确保返回的数据包含必要的字段
+          if (!coupleRelation || !coupleRelation.id) {
+            throw new Error("服务器返回的数据格式不正确");
+          }
 
           // BUG修复：接收方同意后立即设置绑定状态
           set({
@@ -205,10 +229,16 @@ export const useCoupleStore = create<CoupleState>()(
           localStorage.setItem("coupleId", coupleRelation.id);
           localStorage.setItem("isCoupleBound", "true");
 
+          console.log("[acceptRequest] 绑定状态已更新:", {
+            coupleId: coupleRelation.id,
+            partnerId: coupleRelation.partner?.id,
+            isCoupleBound: true,
+          });
+
           // 加载事件
           await get().loadEvents();
         } catch (error) {
-          console.error("接受请求失败:", error);
+          console.error("[acceptRequest] 接受请求失败:", error);
           throw error;
         }
       },
@@ -216,6 +246,8 @@ export const useCoupleStore = create<CoupleState>()(
       // 拒绝绑定请求
       rejectRequest: async (requestId: string) => {
         try {
+          console.log("[rejectRequest] 开始拒绝请求:", requestId);
+
           const response = await fetch(
             "http://localhost:3001/api/couple/reject",
             {
@@ -229,7 +261,8 @@ export const useCoupleStore = create<CoupleState>()(
           );
 
           if (!response.ok) {
-            throw new Error("拒绝请求失败");
+            const errorData = await response.json().catch(() => ({}));
+            throw new Error(errorData.message || "拒绝请求失败");
           }
 
           set({
@@ -237,8 +270,10 @@ export const useCoupleStore = create<CoupleState>()(
               (req) => req.id !== requestId
             ),
           });
+
+          console.log("[rejectRequest] 请求已拒绝");
         } catch (error) {
-          console.error("拒绝请求失败:", error);
+          console.error("[rejectRequest] 拒绝请求失败:", error);
           throw error;
         }
       },
@@ -248,6 +283,8 @@ export const useCoupleStore = create<CoupleState>()(
         set({ isBinding: true, bindingError: null });
 
         try {
+          console.log("[bindCouple] 发送绑定请求给:", partnerId);
+
           const response = await fetch(
             "http://localhost:3001/api/couple/bind",
             {
@@ -278,7 +315,10 @@ export const useCoupleStore = create<CoupleState>()(
             isBinding: false,
             bindingError: null,
           });
+
+          console.log("[bindCouple] 绑定请求已发送，等待对方确认");
         } catch (error) {
+          console.error("[bindCouple] 发送绑定请求失败:", error);
           set({
             isBinding: false,
             bindingError: error instanceof Error ? error.message : "绑定失败",
@@ -290,6 +330,8 @@ export const useCoupleStore = create<CoupleState>()(
       // 解除绑定
       unbindCouple: async () => {
         try {
+          console.log("[unbindCouple] 开始解除绑定");
+
           await fetch("http://localhost:3001/api/couple/unbind", {
             method: "POST",
             headers: {
@@ -308,13 +350,17 @@ export const useCoupleStore = create<CoupleState>()(
 
           localStorage.removeItem("coupleId");
           localStorage.removeItem("isCoupleBound");
+
+          console.log("[unbindCouple] 绑定已解除");
         } catch (error) {
-          console.error("解除绑定失败:", error);
+          console.error("[unbindCouple] 解除绑定失败:", error);
         }
       },
 
       // 添加事件
-      addEvent: async (eventData) => {
+      addEvent: async (
+        eventData: Omit<CoupleEvent, "id" | "createdAt" | "updatedAt">
+      ) => {
         try {
           const response = await fetch(
             "http://localhost:3001/api/couple/events",
@@ -335,7 +381,7 @@ export const useCoupleStore = create<CoupleState>()(
           const rawEvent = await response.json();
 
           // 解析 position 字段
-          const newEvent = {
+          const newEvent: CoupleEvent = {
             ...rawEvent,
             position: rawEvent.position
               ? JSON.parse(rawEvent.position)
@@ -356,7 +402,7 @@ export const useCoupleStore = create<CoupleState>()(
       },
 
       // 更新事件
-      updateEvent: async (eventId, updates) => {
+      updateEvent: async (eventId: string, updates: Partial<CoupleEvent>) => {
         try {
           const response = await fetch(
             `http://localhost:3001/api/couple/events/${eventId}`,
@@ -388,7 +434,7 @@ export const useCoupleStore = create<CoupleState>()(
       },
 
       // 删除事件
-      deleteEvent: async (eventId) => {
+      deleteEvent: async (eventId: string) => {
         try {
           const response = await fetch(
             `http://localhost:3001/api/couple/events/${eventId}`,
@@ -434,7 +480,7 @@ export const useCoupleStore = create<CoupleState>()(
           const rawEvents = await response.json();
 
           // 解析 position 字段（从 JSON 字符串转换为对象）
-          const events = rawEvents.map(
+          const events: CoupleEvent[] = rawEvents.map(
             (event: {
               id: string;
               content: string;
@@ -453,6 +499,8 @@ export const useCoupleStore = create<CoupleState>()(
           );
 
           set({ events, isLoading: false });
+
+          console.log("[loadEvents] 加载了", events.length, "个事件");
         } catch (error) {
           console.error("加载事件失败:", error);
           set({ isLoading: false });
@@ -460,12 +508,12 @@ export const useCoupleStore = create<CoupleState>()(
       },
 
       // 设置事件（用于WebSocket更新）
-      setEvents: (events) => {
+      setEvents: (events: CoupleEvent[]) => {
         set({ events });
       },
 
       // 设置WebSocket连接状态
-      setWsConnected: (connected) => {
+      setWsConnected: (connected: boolean) => {
         set({ wsConnected: connected });
       },
 
@@ -482,6 +530,27 @@ export const useCoupleStore = create<CoupleState>()(
         });
         localStorage.removeItem("coupleId");
         localStorage.removeItem("isCoupleBound");
+
+        console.log("[clearCoupleData] 情侣数据已清除");
+      },
+
+      // 更新对方头像
+      updatePartnerAvatar: (avatar: string) => {
+        set((state) => {
+          if (state.coupleRelation?.partner) {
+            return {
+              coupleRelation: {
+                ...state.coupleRelation,
+                partner: {
+                  ...state.coupleRelation.partner,
+                  avatar,
+                },
+              },
+            };
+          }
+          return state;
+        });
+        console.log("[updatePartnerAvatar] 对方头像已更新");
       },
     }),
     {

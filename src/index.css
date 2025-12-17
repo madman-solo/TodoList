@@ -1190,12 +1190,43 @@ body {
   flex-direction: column;
 }
 
+/* 【头像双向同步】头像上传交互样式 */
+.profile-avatar-wrapper {
+  position: relative;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.profile-avatar-wrapper:hover {
+  transform: scale(1.05);
+}
+
 .profile-avatar {
   width: 120px;
   height: 120px;
   border-radius: 50%;
   object-fit: cover;
   border: 3px solid var(--primary);
+  transition: all 0.3s ease;
+}
+
+.profile-avatar-wrapper:hover .profile-avatar {
+  filter: brightness(0.8);
+}
+
+.avatar-overlay {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 2rem;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+}
+
+.profile-avatar-wrapper:hover .avatar-overlay {
+  opacity: 1;
 }
 
 .profile-name {
@@ -3196,6 +3227,14 @@ body {
   font-size: 0.9rem;
   border: 2px solid rgba(255, 255, 255, 0.3);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+}
+
+/* 【头像双向同步】情侣模式头像可点击样式 */
+.user-avatar-small.clickable:hover {
+  transform: scale(1.1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  border-color: rgba(255, 255, 255, 0.5);
 }
 
 .user-avatar-small img {
@@ -3450,6 +3489,28 @@ body {
 .unbind-btn:hover {
   transform: translateY(-2px);
   box-shadow: 0 6px 20px rgba(231, 76, 60, 0.4);
+}
+
+/* 【头像双向同步】解绑按钮紧凑样式 */
+.unbind-button-small {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(231, 76, 60, 0.2);
+  color: #e74c3c;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  font-size: 1rem;
+}
+
+.unbind-button-small:hover {
+  background: #e74c3c;
+  color: white;
+  transform: scale(1.1);
 }
 
 /* 待处理请求样式 */

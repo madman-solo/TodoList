@@ -33,11 +33,15 @@ router.post("/bind", authenticateToken, async (req, res) => {
     const { partnerId } = req.body;
     const userId = req.user.id;
 
+    console.log(`[绑定请求] 用户${userId}尝试绑定用户${partnerId}`);
+
     if (!partnerId) {
+      console.log("[绑定请求] 错误: 缺少partnerId参数");
       return res.status(400).json({ message: "请提供对方用户ID" });
     }
 
     if (partnerId === userId) {
+      console.log("[绑定请求] 错误: 不能绑定自己");
       return res.status(400).json({ message: "不能绑定自己" });
     }
 
@@ -47,10 +51,11 @@ router.post("/bind", authenticateToken, async (req, res) => {
     });
 
     if (!partner) {
+      console.log(`[绑定请求] 错误: 用户${partnerId}不存在`);
       return res.status(404).json({ message: "对方用户不存在" });
     }
 
-    // 检查是否已经有情侣关系
+    // 检查是否已经有情侣关系（防止重复创建）
     const existingRelation = await prisma.coupleRelation.findFirst({
       where: {
         OR: [
@@ -62,33 +67,48 @@ router.post("/bind", authenticateToken, async (req, res) => {
     });
 
     if (existingRelation) {
+      console.log(
+        `[绑定请求] 错误: 用户${userId}和${partnerId}已经建立了情侣关系`
+      );
       return res.status(400).json({ message: "已经建立了情侣关系" });
     }
 
-    // 创建或更新绑定请求
-    const request = await prisma.coupleRequest.upsert({
+    // 检查是否已有待处理的请求（防止重复发送）
+    const existingRequest = await prisma.coupleRequest.findFirst({
       where: {
-        fromUserId_toUserId: {
-          fromUserId: userId,
-          toUserId: partnerId,
-        },
+        OR: [
+          { fromUserId: userId, toUserId: partnerId },
+          { fromUserId: partnerId, toUserId: userId },
+        ],
       },
-      update: {
-        createdAt: new Date(),
-      },
-      create: {
+    });
+
+    if (existingRequest) {
+      console.log(`[绑定请求] 警告: 已存在待处理的绑定请求`);
+      return res.status(400).json({ message: "已有待处理的绑定请求" });
+    }
+
+    // 创建绑定请求
+    const request = await prisma.coupleRequest.create({
+      data: {
         fromUserId: userId,
         toUserId: partnerId,
       },
     });
+
+    console.log(`[绑定请求] 成功: 请求ID=${request.id}`);
 
     res.json({
       message: "绑定请求已发送，等待对方确认",
       request,
     });
   } catch (error) {
-    console.error("发送绑定请求失败:", error);
-    res.status(500).json({ message: "服务器错误" });
+    console.error("[绑定请求] 失败:", error);
+    console.error("[绑定请求] 错误堆栈:", error.stack);
+    res.status(500).json({
+      message: "服务器错误",
+      error: process.env.NODE_ENV === "development" ? error.message : undefined,
+    });
   }
 });
 
@@ -96,6 +116,8 @@ router.post("/bind", authenticateToken, async (req, res) => {
 router.get("/requests", authenticateToken, async (req, res) => {
   try {
     const userId = req.user.id;
+
+    console.log(`[获取请求] 用户${userId}查询待处理的绑定请求`);
 
     const requests = await prisma.coupleRequest.findMany({
       where: { toUserId: userId },
@@ -110,10 +132,15 @@ router.get("/requests", authenticateToken, async (req, res) => {
       orderBy: { createdAt: "desc" },
     });
 
+    console.log(`[获取请求] 找到${requests.length}个待处理请求`);
     res.json(requests);
   } catch (error) {
-    console.error("获取绑定请求失败:", error);
-    res.status(500).json({ message: "服务器错误" });
+    console.error("[获取请求] 失败:", error);
+    console.error("[获取请求] 错误堆栈:", error.stack);
+    res.status(500).json({
+      message: "服务器错误",
+      error: process.env.NODE_ENV === "development" ? error.message : undefined,
+    });
   }
 });
 
@@ -123,8 +150,11 @@ router.post("/accept", authenticateToken, async (req, res) => {
     const { requestId } = req.body;
     const userId = req.user.id;
 
+    console.log(`[接受请求] 用户${userId}尝试接受请求${requestId}`);
+
     // 参数验证
     if (!requestId) {
+      console.log("[接受请求] 错误: 缺少requestId参数");
       return res.status(400).json({ message: "缺少requestId参数" });
     }
 
@@ -138,21 +168,65 @@ router.post("/accept", authenticateToken, async (req, res) => {
     });
 
     if (!request) {
+      console.log(`[接受请求] 错误: 请求${requestId}不存在`);
       return res.status(404).json({ message: "请求不存在" });
     }
 
     if (request.toUserId !== userId) {
+      console.log(`[接受请求] 错误: 用户${userId}无权操作请求${requestId}`);
       return res.status(403).json({ message: "无权操作此请求" });
+    }
+
+    // 检查是否已存在情侣关系（防止重复创建）
+    const existingRelation = await prisma.coupleRelation.findFirst({
+      where: {
+        OR: [
+          { user1Id: request.fromUserId, user2Id: request.toUserId },
+          { user1Id: request.toUserId, user2Id: request.fromUserId },
+        ],
+        isActive: true,
+      },
+    });
+
+    if (existingRelation) {
+      console.log(`[接受请求] 警告: 情侣关系已存在，删除重复请求`);
+      // 删除重复请求
+      await prisma.coupleRequest.delete({
+        where: { id: requestId },
+      });
+
+      // 返回已存在的关系
+      const partnerId =
+        existingRelation.user1Id === userId
+          ? existingRelation.user2Id
+          : existingRelation.user1Id;
+      const partner = await prisma.user.findUnique({
+        where: { id: partnerId },
+        select: { id: true, name: true },
+      });
+
+      return res.status(200).json({
+        ...existingRelation,
+        partner,
+      });
     }
 
     // 创建情侣关系
     const coupleRelation = await prisma.coupleRelation.create({
       data: {
-        user1Id: Math.min(request.fromUserId, request.toUserId),
-        user2Id: Math.max(request.fromUserId, request.toUserId),
+        user1Id:
+          request.fromUserId < request.toUserId
+            ? request.fromUserId
+            : request.toUserId,
+        user2Id:
+          request.fromUserId < request.toUserId
+            ? request.toUserId
+            : request.fromUserId,
         isActive: true,
       },
     });
+
+    console.log(`[接受请求] 成功创建情侣关系: coupleId=${coupleRelation.id}`);
 
     // 删除所有相关的绑定请求
     await prisma.coupleRequest.deleteMany({
@@ -164,14 +238,16 @@ router.post("/accept", authenticateToken, async (req, res) => {
       },
     });
 
-    // 获取双方用户信息
+    console.log(`[接受请求] 已删除相关绑定请求`);
+
+    // 【修复】获取双方用户信息（包含头像）
     const user1 = await prisma.user.findUnique({
       where: { id: request.fromUserId },
-      select: { id: true, name: true },
+      select: { id: true, name: true, avatar: true },
     });
     const user2 = await prisma.user.findUnique({
       where: { id: request.toUserId },
-      select: { id: true, name: true },
+      select: { id: true, name: true, avatar: true },
     });
 
     // 返回完整的情侣关系信息
@@ -185,6 +261,7 @@ router.post("/accept", authenticateToken, async (req, res) => {
     // 修复：通过Socket.io通知双方绑定成功
     const io = req.app.get("io");
     if (io) {
+      console.log(`[接受请求] 通过Socket.io通知双方绑定成功`);
       // 通知双方用户（使用广播方式）
       io.emit("couple-bound", {
         coupleId: coupleRelation.id,
@@ -193,15 +270,18 @@ router.post("/accept", authenticateToken, async (req, res) => {
         fromUserId: request.fromUserId,
         toUserId: request.toUserId,
       });
+    } else {
+      console.log(`[接受请求] 警告: io未挂载，无法发送Socket.io通知`);
     }
 
+    console.log(`[接受请求] 成功: 返回情侣关系信息`);
     res.status(200).json(response);
   } catch (error) {
-    console.error("接受绑定请求失败:", error);
-    console.error("错误堆栈:", error.stack);
+    console.error("[接受请求] 失败:", error);
+    console.error("[接受请求] 错误堆栈:", error.stack);
     res.status(500).json({
       message: "服务器错误",
-      error: error.message,
+      error: process.env.NODE_ENV === "development" ? error.message : undefined,
     });
   }
 });
@@ -243,7 +323,7 @@ router.post("/reject", authenticateToken, async (req, res) => {
   }
 });
 
-// 获取当前情侣关系
+// 获取当前情侣关系 - 包含对方头像
 router.get("/relation", authenticateToken, async (req, res) => {
   try {
     const userId = req.user.id;
@@ -259,12 +339,12 @@ router.get("/relation", authenticateToken, async (req, res) => {
       return res.json(null);
     }
 
-    // 获取对方用户信息
+    // 获取对方用户信息（包含头像）
     const partnerId =
       relation.user1Id === userId ? relation.user2Id : relation.user1Id;
     const partner = await prisma.user.findUnique({
       where: { id: partnerId },
-      select: { id: true, name: true },
+      select: { id: true, name: true, avatar: true }, // 新增：返回头像字段
     });
 
     res.json({

@@ -3,11 +3,40 @@ import { Outlet, Link } from "react-router-dom";
 import { css } from "@emotion/react";
 import { useUserStore } from "../store";
 import { useThemeStore } from "../store";
+import { useCoupleStore } from "../store/coupleStore";
 import { FaCog, FaQuestionCircle, FaInfoCircle } from "react-icons/fa";
+import { useRef, useEffect } from "react";
+import socketService from "../services/socketService";
 
 const Profile = () => {
-  const { user, isAuthenticated, logout } = useUserStore();
+  const { user, isAuthenticated, logout, updateUser } = useUserStore();
   const { isDarkMode } = useThemeStore();
+  const { coupleId } = useCoupleStore();
+  const avatarInputRef = useRef<HTMLInputElement>(null);
+
+  // 【头像双向同步】监听来自情侣模式/我的页面的头像更新
+  useEffect(() => {
+    if (!socketService.isConnected() || !user) return;
+
+    const unsubscribe = socketService.subscribe((message) => {
+      if (message.type === "avatar-update" && message.data) {
+        const { userId, avatar } = message.data as {
+          userId: string | number;
+          avatar: string;
+        };
+
+        // 如果是当前用户的头像更新
+        if (userId === user.id) {
+          updateUser({ avatar });
+          console.log("收到头像更新，已同步到个人页面");
+        }
+      }
+    });
+
+    return () => {
+      unsubscribe();
+    };
+  }, [user, updateUser]);
 
   // 计算创建天数（示例）
   const creationDate = new Date();
@@ -23,9 +52,97 @@ const Profile = () => {
         <div css={profileCard}>
           <div css={userInfoTop}>
             <div css={avatarContainer}>
-              <div css={avatar}>
-                {user?.name ? user.name.charAt(0).toUpperCase() : "U"}
+              <div
+                css={avatar}
+                onClick={() => avatarInputRef.current?.click()}
+                style={{ cursor: "pointer" }}
+                title="点击更换头像"
+              >
+                {user?.avatar ? (
+                  <img
+                    src={user.avatar}
+                    alt={user.name}
+                    style={{
+                      width: "100%",
+                      height: "100%",
+                      borderRadius: "50%",
+                      objectFit: "cover",
+                    }}
+                  />
+                ) : user?.name ? (
+                  user.name.charAt(0).toUpperCase()
+                ) : (
+                  "U"
+                )}
               </div>
+              {/* 隐藏的文件上传input */}
+              <input
+                ref={avatarInputRef}
+                type="file"
+                accept="image/*"
+                style={{ display: "none" }}
+                onChange={async (e) => {
+                  const file = e.target.files?.[0];
+                  if (!file || !user) return;
+
+                  // 验证文件类型和大小
+                  if (!file.type.startsWith("image/")) {
+                    alert("请选择图片文件");
+                    return;
+                  }
+                  if (file.size > 5 * 1024 * 1024) {
+                    alert("图片大小不能超过5MB");
+                    return;
+                  }
+
+                  try {
+                    // 转换为Base64
+                    const reader = new FileReader();
+                    reader.onloadend = async () => {
+                      const base64String = reader.result as string;
+
+                      // 【头像双向同步】更新本地store
+                      updateUser({ avatar: base64String });
+
+                      // 同步到服务器
+                      try {
+                        await fetch(
+                          `http://localhost:3001/api/users/${user.id}/avatar`,
+                          {
+                            method: "PUT",
+                            headers: {
+                              "Content-Type": "application/json",
+                              Authorization: `Bearer ${localStorage.getItem(
+                                "authToken"
+                              )}`,
+                            },
+                            body: JSON.stringify({ avatar: base64String }),
+                          }
+                        );
+
+                        // 【头像双向同步】通过WebSocket通知其他页面
+                        if (coupleId && socketService.isConnected()) {
+                          socketService.send({
+                            type: "avatar-update",
+                            data: {
+                              userId: user.id,
+                              avatar: base64String,
+                            },
+                          });
+                          console.log("个人页面头像更新已同步到其他页面");
+                        }
+                      } catch (error) {
+                        console.error("头像上传失败:", error);
+                        alert("头像上传失败，请重试");
+                      }
+                    };
+                    reader.readAsDataURL(file);
+                  } catch (error) {
+                    console.error("头像处理失败:", error);
+                    alert("头像处理失败，请重试");
+                  }
+                }}
+              />
             </div>
             <div css={userDetails}>
               <h2>{user?.name || "访客"}</h2>

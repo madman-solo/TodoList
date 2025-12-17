@@ -47,11 +47,12 @@ const Login = () => {
       // 保存认证令牌
       localStorage.setItem("authToken", response.token);
 
-      // 登录到本地存储
+      // 【修复】登录到本地存储，包含头像字段
       login({
         id: response.user.id,
         name: response.user.name,
         password: response.user.password,
+        avatar: response.user.avatar, // 加载头像
       });
 
       // 清空输入框

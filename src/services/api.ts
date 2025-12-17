@@ -93,6 +93,7 @@ export interface LoginResponse {
     id: number;
     name: string;
     password: string;
+    avatar?: string; // 【修复】添加头像字段
     // email: string;
   };
 }
@@ -191,6 +192,40 @@ export const backgroundAPI = {
 
   // 获取每日精选内容：
   getDailyCarousel: () => request<DailyItem[]>(`/dailyCarousel`),
+};
+// 👇 新增：情侣绑定相关API（核心修改）
+// 定义绑定请求类型
+export interface CoupleBinding {
+  id: string;
+  userId: string;
+  partnerId: string;
+  status: "pending" | "accepted" | "rejected";
+  createdAt: string;
+  updatedAt: string;
+}
+
+// 处理绑定请求（接受/拒绝）
+export const handleBindingRequest = async (
+  requestId: string,
+  accept: boolean
+) => {
+  // 从localStorage获取当前用户信息
+  const userStr = localStorage.getItem("user");
+  if (!userStr) {
+    throw new Error("用户未登录");
+  }
+  const user = JSON.parse(userStr);
+
+  // 修复1：移除重复的/api前缀（API_BASE_URL已包含/api）
+  // 修复2：补充Authorization鉴权头（和zustand中一致）
+  return request<CoupleBinding>(`/couple/bind/${requestId}`, {
+    method: "PUT",
+    body: JSON.stringify({ accept }), // 确保传递布尔类型的accept参数
+    headers: {
+      "X-User-Id": user.id, // 传递当前用户ID用于后端验证
+      Authorization: `Bearer ${localStorage.getItem("authToken")}`, // 补充鉴权头
+    },
+  });
 };
 
 // 数据类型定义
