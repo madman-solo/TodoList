@@ -82,12 +82,11 @@ const CreateMemory = () => {
       case "style":
         // 跳转到更换样式页面
         saveAlbum();
-
         navigate(`/memories/style/${albumId}`);
         break;
       case "move":
         // 跳转到选择文件夹页面
-        saveAlbum();
+        // 不在这里保存相册，避免重复创建
         navigate(`/memories/folders?albumId=${albumId}`);
         break;
       case "delete":

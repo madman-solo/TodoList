@@ -1,31 +1,69 @@
 /** @jsxImportSource @emotion/react */
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { css } from "@emotion/react";
 import { Link } from "react-router-dom";
+import { useCoupleStore } from "../../store/coupleStore";
+import { useUserStore } from "../../store";
 
 const WishList = () => {
-  // 左侧清单状态
+  const { user } = useUserStore();
+  const { coupleRelation, partnerId } = useCoupleStore();
+
+  // 左侧清单状态（我的心愿）
   const [leftInput, setLeftInput] = useState("");
   const [leftWishes, setLeftWishes] = useState<string[]>([]);
 
-  // 右侧清单状态
+  // 右侧清单状态（TA的心愿）
   const [rightInput, setRightInput] = useState("");
   const [rightWishes, setRightWishes] = useState<string[]>([]);
 
+  // 从本地存储加载数据
+  useEffect(() => {
+    const savedLeftWishes = localStorage.getItem("leftWishes");
+    const savedRightWishes = localStorage.getItem("rightWishes");
+
+    if (savedLeftWishes) {
+      setLeftWishes(JSON.parse(savedLeftWishes));
+    }
+    if (savedRightWishes) {
+      setRightWishes(JSON.parse(savedRightWishes));
+    }
+  }, []);
+
+  // 保存左侧心愿到本地存储
+  const saveLeftWishes = (wishes: string[]) => {
+    localStorage.setItem("leftWishes", JSON.stringify(wishes));
+  };
+
+  // 保存右侧心愿到本地存储
+  const saveRightWishes = (wishes: string[]) => {
+    localStorage.setItem("rightWishes", JSON.stringify(wishes));
+  };
+
   const addLeftWish = () => {
     if (leftInput.trim()) {
-      setLeftWishes([...leftWishes, leftInput.trim()]);
+      const newWishes = [...leftWishes, leftInput.trim()];
+      setLeftWishes(newWishes);
+      saveLeftWishes(newWishes);
       setLeftInput("");
     }
   };
 
   const addRightWish = () => {
     if (rightInput.trim()) {
-      setRightWishes([...rightWishes, rightInput.trim()]);
+      const newWishes = [...rightWishes, rightInput.trim()];
+      setRightWishes(newWishes);
+      saveRightWishes(newWishes);
       setRightInput("");
     }
   };
+
+  // 判断当前用户是否可以编辑左侧（我的心愿）
+  const canEditLeft = true; // 用户总是可以编辑自己的心愿
+
+  // 判断当前用户是否可以编辑右侧（TA的心愿）
+  const canEditRight = false; // 用户不能编辑对方的心愿
 
   return (
     <div css={container}>
@@ -44,12 +82,19 @@ const WishList = () => {
             <input
               type="text"
               value={leftInput}
-              onChange={(e) => setLeftInput(e.target.value)}
-              placeholder="添加心愿..."
-              css={inputStyle}
-              onKeyDown={(e) => e.key === "Enter" && addLeftWish()}
+              onChange={(e) => canEditLeft && setLeftInput(e.target.value)}
+              placeholder={canEditLeft ? "添加心愿..." : "只能查看对方心愿"}
+              css={[inputStyle, !canEditLeft && disabledInputStyle]}
+              onKeyDown={(e) =>
+                e.key === "Enter" && canEditLeft && addLeftWish()
+              }
+              disabled={!canEditLeft}
             />
-            <button onClick={addLeftWish} css={leftButton}>
+            <button
+              onClick={addLeftWish}
+              css={[leftButton, !canEditLeft && disabledButtonStyle]}
+              disabled={!canEditLeft}
+            >
               添加
             </button>
           </div>
@@ -72,12 +117,19 @@ const WishList = () => {
             <input
               type="text"
               value={rightInput}
-              onChange={(e) => setRightInput(e.target.value)}
-              placeholder="添加心愿..."
-              css={inputStyle}
-              onKeyDown={(e) => e.key === "Enter" && addRightWish()}
+              onChange={(e) => canEditRight && setRightInput(e.target.value)}
+              placeholder={canEditRight ? "添加心愿..." : "只能查看对方心愿"}
+              css={[inputStyle, !canEditRight && disabledInputStyle]}
+              onKeyDown={(e) =>
+                e.key === "Enter" && canEditRight && addRightWish()
+              }
+              disabled={!canEditRight}
             />
-            <button onClick={addRightWish} css={rightButton}>
+            <button
+              onClick={addRightWish}
+              css={[rightButton, !canEditRight && disabledButtonStyle]}
+              disabled={!canEditRight}
+            >
               添加
             </button>
           </div>
@@ -255,6 +307,26 @@ const backButton = css`
     color: #6c5ce7;
     transform: translateY(-2px);
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+  }
+`;
+
+const disabledInputStyle = css`
+  background: #f5f5f5;
+  color: #999;
+  cursor: not-allowed;
+
+  &:focus {
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  }
+`;
+
+const disabledButtonStyle = css`
+  background: #ccc;
+  cursor: not-allowed;
+
+  &:hover {
+    background: #ccc;
+    transform: none;
   }
 `;
 

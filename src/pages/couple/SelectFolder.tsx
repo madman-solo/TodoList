@@ -67,14 +67,10 @@ const SelectFolder = () => {
     const updatedFolders = [...folders, newFolder];
     setFolders(updatedFolders);
     localStorage.setItem("memoryFolders", JSON.stringify(updatedFolders));
-    const upfolder = localStorage.getItem("memoryFolders");
-    console.log(upfolder);
-    // 存了一个
 
     setShowCreateFolder(false);
     setNewFolderName("文件夹");
     selectFolder(newFolder.id);
-    navigate(`/memories/create?albumId=${albumId}`);
   };
 
   return (
