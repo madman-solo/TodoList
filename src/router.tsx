@@ -12,7 +12,10 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import CoupleRouteGuard from "./components/CoupleRouteGuard";
 import FutureList from "./pages/couple/FutureList.tsx";
 import WishList from "./pages/couple/WishList.tsx";
-import TableStyle from "./pages/couple/TableStyle.tsx";
+import TableNavigation from "./pages/couple/TableNavigation.tsx";
+import MyTables from "./pages/couple/MyTables.tsx";
+import TableStore from "./pages/couple/TableStore.tsx";
+import Activity from "./pages/couple/Activity.tsx";
 import CoupleGames from "./pages/couple/CoupleGames.tsx";
 import Profile from "./pages/Profile.tsx";
 import ViewSettings from "./pages/ViewSettings.tsx";
@@ -88,7 +91,16 @@ const router = createBrowserRouter([
         ),
         children: [
           { index: true, element: <FutureList /> },
-          { path: "table", element: <TableStyle /> },
+          {
+            path: "table",
+            element: <TableNavigation />,
+            children: [
+              { index: true, element: <MyTables /> },
+              { path: "my-tables", element: <MyTables /> },
+              { path: "store", element: <TableStore /> },
+              { path: "activity", element: <Activity /> },
+            ],
+          },
           { path: "games", element: <CoupleGames /> },
         ],
       },

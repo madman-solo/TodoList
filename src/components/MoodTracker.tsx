@@ -1,19 +1,74 @@
 /** @jsxImportSource @emotion/react */
 import { useState } from "react";
-import {
-  FaSmile,
-  FaMeh,
-  FaFrown,
-  FaStar,
-  // FaSun,
-  // FaHeart,
-} from "react-icons/fa";
+import { FaStar } from "react-icons/fa";
 import { css } from "@emotion/react";
+import { useTodoStore } from "../store";
+
+// 默认本地表情包
+const DEFAULT_LOCAL_EMOJIS = ["😊", "😂", "😍", "😎", "🥰", "😭"];
 
 const MoodTracker = () => {
-  const [mood, setMood] = useState<"happy" | "neutral" | "sad" | null>(null);
+  const [mood, setMood] = useState<string | null>(null);
   const [blessings, setBlessings] = useState<string[]>([]);
   const [newBlessing, setNewBlessing] = useState("");
+  const [emojiSource, setEmojiSource] = useState<"local" | "api">("local");
+  const [emojis, setEmojis] = useState<string[]>(DEFAULT_LOCAL_EMOJIS);
+  const [isLoadingEmojis, setIsLoadingEmojis] = useState(false);
+  const [showTip, setShowTip] = useState(false);
+
+  const { todos } = useTodoStore();
+
+  // 从在线API获取表情包
+  const fetchOnlineEmojis = async () => {
+    setIsLoadingEmojis(true);
+    try {
+      // 使用emoji-api.com的免费API
+      const response = await fetch(
+        "https://emoji-api.com/emojis?access_key=demo_key"
+      );
+      const data = await response.json();
+
+      // 随机选择6个表情
+      const randomEmojis = data
+        .sort(() => Math.random() - 0.5)
+        .slice(0, 6)
+        .map((emoji: { character: string }) => emoji.character);
+
+      setEmojis(randomEmojis);
+    } catch (error) {
+      console.error("获取在线表情包失败:", error);
+      // 失败时使用备用表情
+      setEmojis(["🌟", "🎉", "💖", "🌈", "✨", "🎈"]);
+    } finally {
+      setIsLoadingEmojis(false);
+    }
+  };
+
+  // 切换表情包来源
+  const handleSourceChange = (source: "local" | "api") => {
+    setEmojiSource(source);
+    if (source === "api") {
+      fetchOnlineEmojis();
+    } else {
+      setEmojis(DEFAULT_LOCAL_EMOJIS);
+    }
+  };
+
+  // 选择表情
+  const handleEmojiSelect = (emoji: string) => {
+    setMood(emoji);
+    // 选择心情后显示提示
+    if (todos.length > 0) {
+      setShowTip(true);
+      setTimeout(() => setShowTip(false), 3000);
+    }
+  };
+
+  // 处理表情拖拽开始
+  const handleEmojiDragStart = (e: React.DragEvent, emoji: string) => {
+    e.dataTransfer.effectAllowed = "copy";
+    e.dataTransfer.setData("text/plain", emoji);
+  };
 
   const handleAddBlessing = () => {
     if (newBlessing.trim()) {
@@ -25,27 +80,56 @@ const MoodTracker = () => {
   return (
     <div css={containerStyle}>
       <div css={moodSection}>
-        <h3>今日心情</h3>
-        <div css={moodIcons}>
-          <button
-            css={moodButton(mood === "happy")}
-            onClick={() => setMood("happy")}
-          >
-            <FaSmile size={24} />
-          </button>
-          <button
-            css={moodButton(mood === "neutral")}
-            onClick={() => setMood("neutral")}
-          >
-            <FaMeh size={24} />
-          </button>
-          <button
-            css={moodButton(mood === "sad")}
-            onClick={() => setMood("sad")}
-          >
-            <FaFrown size={24} />
-          </button>
+        <div css={moodHeaderStyle}>
+          <h3>今日心情</h3>
+          <div css={sourceToggleStyle}>
+            <button
+              css={sourceButton(emojiSource === "local")}
+              onClick={() => handleSourceChange("local")}
+            >
+              本地表情
+            </button>
+            <button
+              css={sourceButton(emojiSource === "api")}
+              onClick={() => handleSourceChange("api")}
+            >
+              在线表情
+            </button>
+          </div>
         </div>
+
+        {isLoadingEmojis ? (
+          <div css={loadingStyle}>加载中...</div>
+        ) : (
+          <div css={emojiGridStyle}>
+            {emojis.map((emoji, index) => (
+              <button
+                key={index}
+                css={emojiButton(mood === emoji)}
+                onClick={() => handleEmojiSelect(emoji)}
+                draggable={todos.length > 0}
+                onDragStart={(e) => handleEmojiDragStart(e, emoji)}
+                style={{
+                  cursor: todos.length > 0 ? "grab" : "pointer",
+                }}
+              >
+                {emoji}
+              </button>
+            ))}
+          </div>
+        )}
+
+        {mood && (
+          <div css={selectedMoodStyle}>
+            <span>当前心情：</span>
+            <span css={selectedEmojiStyle}>{mood}</span>
+            {todos.length > 0 && (
+              <span css={dragHintStyle}>
+                {showTip ? "💡 拖拽表情到待办清单试试" : ""}
+              </span>
+            )}
+          </div>
+        )}
       </div>
 
       <div css={blessingsSection}>
@@ -78,43 +162,133 @@ const MoodTracker = () => {
 
 // 样式定义
 const containerStyle = css`
-  padding: 20px;
-  gap: 20px;
+  padding: 15px;
+  gap: 15px;
   display: flex;
   flex-direction: column;
 `;
 
 const moodSection = css`
-  padding: 15px;
+  padding: 10px;
   border-radius: 8px;
   background: #f5f5f5;
 `;
 
-const moodIcons = css`
+const moodHeaderStyle = css`
   display: flex;
-  gap: 15px;
-  margin-top: 10px;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+
+  h3 {
+    font-size: 14px;
+    margin: 0;
+  }
 `;
 
-const moodButton = (isActive: boolean) => css`
-  background: ${isActive ? "#e0f2fe" : "transparent"};
+const sourceToggleStyle = css`
+  display: flex;
+  gap: 8px;
+  background: white;
+  padding: 4px;
+  border-radius: 6px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+`;
+
+const sourceButton = (isActive: boolean) => css`
+  padding: 6px 12px;
   border: none;
-  border-radius: 50%;
-  width: 50px;
-  height: 50px;
+  border-radius: 4px;
+  background: ${isActive ? "#fea93aff" : "transparent"};
+  color: ${isActive ? "white" : "#666"};
   cursor: pointer;
+  font-size: 12px;
+  transition: all 0.3s;
+
+  &:hover {
+    background: ${isActive ? "#fea93aff" : "#f0f0f0"};
+  }
+`;
+
+const emojiGridStyle = css`
+  display: flex;
+  flex-wrap: wrap;
+  gap: 3px;
+`;
+
+const emojiButton = (isActive: boolean) => css`
+  background: ${isActive ? "#fef3c7" : "white"};
+  border: 2px solid ${isActive ? "#fea93aff" : "#e5e7eb"};
+  border-radius: 6px;
+  width: 40px;
+  height: 40px;
+  aspect-ratio: 1;
+  cursor: pointer;
+  font-size: 14px;
   transition: all 0.3s;
   display: flex;
   align-items: center;
   justify-content: center;
+  box-shadow: ${isActive
+    ? "0 3px 5px rgba(254, 169, 58, 0.3)"
+    : "0 1px 2px rgba(0, 0, 0, 0.1)"};
+  transform: ${isActive ? "scale(1.05)" : "scale(1)"};
 
   &:hover {
-    transform: scale(1.1);
+    transform: scale(1.08);
+    border-color: #fea93aff;
+    box-shadow: 0 3px 5px rgba(254, 169, 58, 0.2);
+  }
+`;
+
+const loadingStyle = css`
+  text-align: center;
+  padding: 20px;
+  color: #666;
+`;
+
+const selectedMoodStyle = css`
+  margin-top: 8px;
+  padding: 6px 10px;
+  background: white;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: #666;
+  transition: all 0.3s;
+  user-select: none;
+
+  &:active {
+    cursor: grabbing;
+  }
+`;
+
+const selectedEmojiStyle = css`
+  font-size: 14px;
+`;
+
+const dragHintStyle = css`
+  margin-left: auto;
+  font-size: 12px;
+  color: #fea93aff;
+  font-weight: 500;
+  animation: pulse 2s infinite;
+
+  @keyframes pulse {
+    0%,
+    100% {
+      opacity: 0.6;
+    }
+    50% {
+      opacity: 1;
+    }
   }
 `;
 
 const blessingsSection = css`
-  padding: 15px;
+  padding: 12px;
   border-radius: 8px;
   background: #f5f5f5;
 `;

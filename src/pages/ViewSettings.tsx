@@ -45,6 +45,101 @@ const container = (isDarkMode: boolean) => css`
   margin: 2rem auto;
   padding: 0 1rem;
   color: ${isDarkMode ? "#f5f5f5" : "#333"};
+  min-height: 100vh;
+  overflow-x: hidden;
+  max-width: 100vw;
+  background: linear-gradient(
+    135deg,
+    #f4c2c2 0%,
+    #f7d4d4 15%,
+    #fae6e6 30%,
+    #fef0f0 45%,
+    #fae6e6 60%,
+    #f7d4d4 75%,
+    #f4c2c2 90%,
+    #f0b8b8 100%
+  );
+  animation: catEyeShimmer 8s ease-in-out infinite;
+  position: relative;
+
+  &::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+      90deg,
+      transparent 0%,
+      rgba(255, 192, 203, 0.4) 45%,
+      rgba(255, 218, 224, 0.6) 50%,
+      rgba(255, 192, 203, 0.4) 55%,
+      transparent 100%
+    );
+    animation: catEyeGloss 6s ease-in-out infinite;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  &::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background: linear-gradient(
+      90deg,
+      transparent 0%,
+      rgba(255, 182, 193, 0.7) 50%,
+      transparent 100%
+    );
+    box-shadow: 0 0 20px rgba(255, 182, 193, 0.7),
+      0 0 40px rgba(255, 192, 203, 0.5), 0 0 60px rgba(255, 182, 193, 0.4);
+    animation: catEyeLine 8s ease-in-out infinite;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  @keyframes catEyeShimmer {
+    0%,
+    100% {
+      background-position: 0% 50%;
+    }
+    50% {
+      background-position: 100% 50%;
+    }
+  }
+
+  @keyframes catEyeGloss {
+    0% {
+      transform: translateX(-100%);
+      opacity: 0;
+    }
+    20% {
+      opacity: 1;
+    }
+    80% {
+      opacity: 1;
+    }
+    100% {
+      transform: translateX(100%);
+      opacity: 0;
+    }
+  }
+
+  @keyframes catEyeLine {
+    0%,
+    100% {
+      top: 30%;
+      opacity: 0.6;
+    }
+    50% {
+      top: 70%;
+      opacity: 1;
+    }
+  }
 `;
 
 const pageTitle = css`
@@ -55,10 +150,13 @@ const pageTitle = css`
 `;
 
 const settingCard = css`
-  background: white;
+  background: rgba(255, 255, 255, 0.9);
   border-radius: 16px;
   padding: 1.5rem;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  position: relative;
+  z-index: 1;
+  backdrop-filter: blur(10px);
 `;
 
 const sectionTitle = css`

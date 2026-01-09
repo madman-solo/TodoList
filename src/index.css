@@ -1,14 +1,42 @@
-/* 引入字体 */
-@import url("https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Poppins:wght@300;400;600&display=swap");
+/* 引入字体 - 优化为更柔和的字体 */
+@import url("https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&family=Quicksand:wght@400;500;600;700&family=Playfair+Display:wght@400;700&display=swap");
 
-/* 基础样式重置与变量定义 */
+/* 基础样式重置与变量定义 - 优化为温柔粉紫色系 */
 :root {
-  --primary: #484747;
-  --secondary: #e7a3bb;
-  --accent: #ffeaa7;
-  --dark: #2d3436;
+  /* 主色调 - 温柔粉紫系 */
+  --primary: #e8b4d9;
+  --primary-light: #f5d7e8;
+  --primary-dark: #d89bc7;
+
+  /* 辅助色 - 温暖橙粉系 */
+  --secondary: #ffb6c1;
+  --accent: #ffc8a2;
+
+  /* 情侣模式专属色 */
+  --couple-primary: #ffd4e5;
+  --couple-secondary: #e6e6fa;
+
+  /* 中性色 */
+  --text-primary: #4a4a4a;
+  --text-secondary: #8b8b8b;
+  --bg-light: #fff9fb;
+  --bg-card: #ffffff;
+
+  /* 原有变量保持兼容 */
+  --dark: #4a4a4a;
   --light: #f8f9fa;
-  --shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+
+  /* 功能色 */
+  --success: #a8e6cf;
+  --warning: #ffd3b6;
+  --error: #ffaaa5;
+
+  /* 阴影 - 优化为更柔和的粉紫色阴影 */
+  --shadow: 0 4px 16px rgba(232, 180, 217, 0.2);
+  --shadow-sm: 0 2px 8px rgba(232, 180, 217, 0.15);
+  --shadow-md: 0 4px 16px rgba(232, 180, 217, 0.2);
+  --shadow-lg: 0 8px 24px rgba(232, 180, 217, 0.25);
+
   --transition: all 0.3s ease;
 }
 
@@ -19,40 +47,134 @@
 }
 
 body {
-  font-family: "Poppins", sans-serif;
+  font-family: "Quicksand", "Noto Sans SC", "Poppins", sans-serif;
   transition: background-color 0.5s ease, color 0.5s ease;
   line-height: 1.6;
+  overflow-x: hidden;
+  max-width: 100vw;
 }
 
-/* 主题模式样式增强 */
+/* 主题模式样式增强 - 优化为温柔粉紫色 */
 .light-mode {
-  background-color: #f9f7ff;
-  color: var(--dark);
-  background-image: radial-gradient(
-      circle at 10% 20%,
-      rgba(108, 92, 231, 0.05) 0%,
-      transparent 20%
-    ),
-    radial-gradient(
-      circle at 90% 80%,
-      rgba(253, 121, 168, 0.05) 0%,
-      transparent 20%
-    );
+  background: linear-gradient(
+    135deg,
+    #f5e6d3 0%,
+    #f9ead5 15%,
+    #fef3e2 30%,
+    #fff8ed 45%,
+    #fef3e2 60%,
+    #f9ead5 75%,
+    #f5e6d3 90%,
+    #f0dfc8 100%
+  );
+  color: var(--text-primary);
+  animation: catEyeShimmer 8s ease-in-out infinite;
+  position: relative;
+  overflow-x: hidden;
+  max-width: 100vw;
+}
+
+/* 淡金色猫眼光泽效果 */
+.light-mode::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 223, 186, 0.5) 45%,
+    rgba(255, 235, 205, 0.7) 50%,
+    rgba(255, 223, 186, 0.5) 55%,
+    transparent 100%
+  );
+  animation: catEyeGloss 6s ease-in-out infinite;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* 淡金色猫眼磁性线条效果 */
+.light-mode::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(218, 165, 32, 0.6) 50%,
+    transparent 100%
+  );
+  box-shadow: 0 0 20px rgba(218, 165, 32, 0.6), 0 0 40px rgba(184, 134, 11, 0.4),
+    0 0 60px rgba(218, 165, 32, 0.3);
+  animation: catEyeLine 8s ease-in-out infinite;
+  pointer-events: none;
+  z-index: 0;
 }
 
 .dark-mode {
-  background-color: #1a1a2e;
+  background: linear-gradient(
+    135deg,
+    #1a3a52 0%,
+    #2c5f7f 15%,
+    #3d7fa8 30%,
+    #4a9bc9 45%,
+    #3d7fa8 60%,
+    #2c5f7f 75%,
+    #1a3a52 90%,
+    #0f2942 100%
+  );
   color: var(--light);
-  background-image: radial-gradient(
-      circle at 10% 20%,
-      rgba(108, 92, 231, 0.1) 0%,
-      transparent 20%
-    ),
-    radial-gradient(
-      circle at 90% 80%,
-      rgba(253, 121, 168, 0.1) 0%,
-      transparent 20%
-    );
+  animation: catEyeShimmer 8s ease-in-out infinite;
+  position: relative;
+  overflow-x: hidden;
+  max-width: 100vw;
+}
+
+/* 深蓝色猫眼光泽效果 */
+.dark-mode::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(135, 206, 250, 0.4) 45%,
+    rgba(173, 216, 230, 0.6) 50%,
+    rgba(135, 206, 250, 0.4) 55%,
+    transparent 100%
+  );
+  animation: catEyeGloss 6s ease-in-out infinite;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* 深蓝色猫眼磁性线条效果 */
+.dark-mode::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(135, 206, 250, 0.8) 50%,
+    transparent 100%
+  );
+  box-shadow: 0 0 20px rgba(135, 206, 250, 0.8),
+    0 0 40px rgba(100, 149, 237, 0.6), 0 0 60px rgba(70, 130, 180, 0.4);
+  animation: catEyeLine 8s ease-in-out infinite;
+  pointer-events: none;
+  z-index: 0;
 }
 
 /* 导航样式升级 */
@@ -99,7 +221,7 @@ body {
   border-radius: 15px;
   background: rgba(255, 255, 255, 0.1);
   border: 1px solid rgba(255, 255, 255, 0.2);
-  color: #f0e6d6;
+  color: #47443e;
   font-weight: 500;
   text-decoration: none;
   transition: all 0.3s ease;
@@ -650,7 +772,7 @@ body {
 }
 
 .love-task span {
-  color: #f0e6d6;
+  color: #47443e;
   font-size: 1.1rem;
   text-align: left;
   flex: 1;
@@ -668,7 +790,7 @@ body {
   border: 2px solid rgba(249, 224, 118, 0.3);
   border-radius: 30px;
   background: rgba(255, 255, 255, 0.1);
-  color: #f0e6d6;
+  color: #44423f;
   backdrop-filter: blur(5px);
   transition: var(--transition);
 }
@@ -761,45 +883,292 @@ body {
   color: #b2bec3;
 }
 
-/* 情侣模式 - 梵高星空风格 */
+/* 情侣模式 - 银色猫眼样式 */
 .couple-mode {
   min-height: 100vh;
   position: relative;
-  overflow: hidden;
+  overflow-x: hidden;
+  max-width: 100vw;
   background: linear-gradient(
     135deg,
-    #060f24 0%,
-    #090317 30%,
-    #12072d 50%,
-    #260542 70%,
-    #1c0432 80%,
-    #080216 100%
+    #c0c0c0 0%,
+    #d3d3d3 15%,
+    #e8e8e8 30%,
+    #f5f5f5 45%,
+    #e8e8e8 60%,
+    #d3d3d3 75%,
+    #c0c0c0 90%,
+    #b8b8b8 100%
   );
-  color: #f0e6d6;
+  color: #f0eaea;
+  animation: catEyeShimmer 8s ease-in-out infinite;
 }
 
+/* 猫眼光泽效果 */
+.couple-mode::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.6) 45%,
+    rgba(255, 255, 255, 0.9) 50%,
+    rgba(255, 255, 255, 0.6) 55%,
+    transparent 100%
+  );
+  animation: catEyeGloss 6s ease-in-out infinite;
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* 猫眼磁性线条效果 */
+.couple-mode::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.8) 50%,
+    transparent 100%
+  );
+  box-shadow: 0 0 20px rgba(255, 255, 255, 0.8),
+    0 0 40px rgba(255, 255, 255, 0.6), 0 0 60px rgba(255, 255, 255, 0.4);
+  animation: catEyeLine 8s ease-in-out infinite;
+  pointer-events: none;
+  z-index: 1;
+}
+
+@keyframes catEyeShimmer {
+  0%,
+  100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
+@keyframes catEyeGloss {
+  0% {
+    transform: translateX(-100%);
+    opacity: 0;
+  }
+  20% {
+    opacity: 1;
+  }
+  80% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+}
+
+@keyframes catEyeLine {
+  0%,
+  100% {
+    top: 30%;
+    opacity: 0.6;
+  }
+  50% {
+    top: 70%;
+    opacity: 1;
+  }
+}
+
+/* 银色猫眼星空效果 - 银色闪烁粒子 */
 .starry-sky {
   position: absolute;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
+  overflow: hidden;
+  z-index: 2;
 }
 
 .star {
   position: absolute;
-  background-color: #fff;
+  background: radial-gradient(
+    circle,
+    rgba(255, 255, 255, 0.9) 0%,
+    rgba(192, 192, 192, 0.6) 50%,
+    transparent 100%
+  );
   border-radius: 50%;
-  box-shadow: 0 0 10px rgba(255, 255, 255, 0.8);
-  animation: twinkle 3s infinite alternate;
+  box-shadow: 0 0 8px rgba(255, 255, 255, 0.8),
+    0 0 15px rgba(192, 192, 192, 0.5);
+  animation: silverTwinkle 3s infinite ease-in-out;
 }
 
-@keyframes twinkle {
+/* 银色猫眼特殊星星 - 钻石般闪烁 */
+.heart-star {
+  position: absolute;
+  font-size: 14px;
+  color: #e8e8e8;
+  animation: diamondSparkle 4s infinite ease-in-out;
+  filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.9))
+    drop-shadow(0 0 20px rgba(192, 192, 192, 0.7));
+}
+
+@keyframes silverTwinkle {
+  0%,
+  100% {
+    opacity: 0.3;
+    transform: scale(0.8);
+    box-shadow: 0 0 8px rgba(255, 255, 255, 0.6),
+      0 0 15px rgba(192, 192, 192, 0.4);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.2);
+    box-shadow: 0 0 15px rgba(255, 255, 255, 1),
+      0 0 30px rgba(192, 192, 192, 0.8), 0 0 45px rgba(211, 211, 211, 0.6);
+  }
+}
+
+@keyframes diamondSparkle {
+  0%,
+  100% {
+    opacity: 0.4;
+    transform: scale(0.9) rotate(0deg);
+    filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.7))
+      drop-shadow(0 0 20px rgba(192, 192, 192, 0.5));
+  }
+  25% {
+    opacity: 0.8;
+    transform: scale(1.1) rotate(90deg);
+    filter: drop-shadow(0 0 15px rgba(255, 255, 255, 0.9))
+      drop-shadow(0 0 30px rgba(211, 211, 211, 0.7));
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.3) rotate(180deg);
+    filter: drop-shadow(0 0 20px rgba(255, 255, 255, 1))
+      drop-shadow(0 0 40px rgba(192, 192, 192, 0.9))
+      drop-shadow(0 0 60px rgba(169, 169, 169, 0.7));
+  }
+  75% {
+    opacity: 0.8;
+    transform: scale(1.1) rotate(270deg);
+    filter: drop-shadow(0 0 15px rgba(255, 255, 255, 0.9))
+      drop-shadow(0 0 30px rgba(211, 211, 211, 0.7));
+  }
+}
+
+/* 银色猫眼云朵效果 - 柔和的银色光晕 */
+.clouds-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 2;
+}
+
+.cloud {
+  position: absolute;
+  background: radial-gradient(
+    ellipse at center,
+    rgba(255, 255, 255, 0.3) 0%,
+    rgba(211, 211, 211, 0.2) 30%,
+    rgba(192, 192, 192, 0.1) 60%,
+    transparent 100%
+  );
+  border-radius: 50%;
+  filter: blur(60px);
+  opacity: 0.5;
+  animation: silverFloat 40s infinite ease-in-out;
+}
+
+.cloud-1 {
+  width: 350px;
+  height: 140px;
+  top: 20%;
+  left: -175px;
+  animation: silverFloat1 50s infinite ease-in-out;
+}
+
+.cloud-2 {
+  width: 450px;
+  height: 170px;
+  top: 50%;
+  left: -225px;
+  animation: silverFloat2 60s infinite ease-in-out;
+  animation-delay: 10s;
+}
+
+.cloud-3 {
+  width: 400px;
+  height: 150px;
+  top: 80%;
+  left: -200px;
+  animation: silverFloat3 55s infinite ease-in-out;
+  animation-delay: 20s;
+}
+
+@keyframes silverFloat1 {
   0% {
+    left: -175px;
+    transform: translateY(0) scale(1);
     opacity: 0.3;
   }
+  50% {
+    left: 50%;
+    transform: translateY(-20px) scale(1.1);
+    opacity: 0.6;
+  }
   100% {
-    opacity: 1;
+    left: 110%;
+    transform: translateY(0) scale(1);
+    opacity: 0.3;
+  }
+}
+
+@keyframes silverFloat2 {
+  0% {
+    left: -225px;
+    transform: translateY(0) scale(1);
+    opacity: 0.4;
+  }
+  50% {
+    left: 50%;
+    transform: translateY(30px) scale(1.15);
+    opacity: 0.7;
+  }
+  100% {
+    left: 110%;
+    transform: translateY(0) scale(1);
+    opacity: 0.4;
+  }
+}
+
+@keyframes silverFloat3 {
+  0% {
+    left: -200px;
+    transform: translateY(0) scale(1);
+    opacity: 0.35;
+  }
+  50% {
+    left: 50%;
+    transform: translateY(-15px) scale(1.12);
+    opacity: 0.65;
+  }
+  100% {
+    left: 110%;
+    transform: translateY(0) scale(1);
+    opacity: 0.35;
   }
 }
 
@@ -1179,6 +1548,64 @@ body {
 .my-page {
   padding: 1rem;
   padding-bottom: 2rem;
+  background: linear-gradient(
+    135deg,
+    #f4c2c2 0%,
+    #f7d4d4 15%,
+    #fae6e6 30%,
+    #fef0f0 45%,
+    #fae6e6 60%,
+    #f7d4d4 75%,
+    #f4c2c2 90%,
+    #f0b8b8 100%
+  );
+  animation: catEyeShimmer 8s ease-in-out infinite;
+  position: relative;
+  min-height: 100vh;
+  overflow-x: hidden;
+  max-width: 100vw;
+}
+
+/* 裸粉色猫眼光泽效果 - 我的页面 */
+.my-page::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 192, 203, 0.4) 45%,
+    rgba(255, 218, 224, 0.6) 50%,
+    rgba(255, 192, 203, 0.4) 55%,
+    transparent 100%
+  );
+  animation: catEyeGloss 6s ease-in-out infinite;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* 裸粉色猫眼磁性线条效果 - 我的页面 */
+.my-page::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 182, 193, 0.7) 50%,
+    transparent 100%
+  );
+  box-shadow: 0 0 20px rgba(255, 182, 193, 0.7),
+    0 0 40px rgba(255, 192, 203, 0.5), 0 0 60px rgba(255, 182, 193, 0.4);
+  animation: catEyeLine 8s ease-in-out infinite;
+  pointer-events: none;
+  z-index: 0;
 }
 
 .profile-header {
@@ -3246,7 +3673,7 @@ body {
 
 .user-name-small {
   font-size: 0.75rem;
-  color: #f0e6d6;
+  color: #3a3936;
   font-weight: 500;
   text-align: center;
   max-width: 60px;
@@ -3282,7 +3709,7 @@ body {
   align-items: center;
   gap: 0.3rem;
   font-size: 0.7rem;
-  color: #f0e6d6;
+  color: #3a3936;
   opacity: 0.8;
 }
 
@@ -3530,11 +3957,14 @@ body {
 }
 
 .section-header h3 {
-  font-size: 1.5rem;
-  color: var(--primary);
+  font-size: 1rem;
+  /* color: var(--primary); */
   margin: 0 0 1.5rem 0;
   text-align: center;
-  font-family: "Playfair Display", serif;
+  font-family: "Microsoft YaHei Light", sans-serif;
+  font-weight: 300;
+  color: #4a4949;
+  line-height: 1.7;
 }
 
 .dark-mode .section-header h3 {

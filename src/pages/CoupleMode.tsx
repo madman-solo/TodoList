@@ -1,12 +1,10 @@
 /** @jsxImportSource @emotion/react */
 
-import { Outlet, Link, useLocation, useNavigate } from "react-router-dom";
+import { Outlet, Link, useLocation } from "react-router-dom";
 import { css } from "@emotion/react";
 import { useState, useEffect } from "react";
 import { useThemeStore } from "../store";
-import { useCoupleStore } from "../store/coupleStore";
 import CoupleHeader from "../components/CoupleHeader";
-import socketService from "../services/socketService";
 
 const CoupleMode = () => {
   const location = useLocation();
@@ -18,29 +16,32 @@ const CoupleMode = () => {
       size: number;
       opacity: number;
       delay: number;
+      isSpecial: boolean;
     }>
   >([]);
 
-  // 生成星空效果
+  // 生成梵高风格的星空效果 - 更多更密集的星星
   useEffect(() => {
-    const stars = Array.from({ length: 150 }, () => ({
+    const stars = Array.from({ length: 200 }, (_, index) => ({
       top: `${Math.random() * 100}vh`,
       left: `${Math.random() * 100}vw`,
       size: Math.random() * 3 + 1,
       opacity: Math.random() * 0.8 + 0.2,
-      delay: Math.random() * 5,
+      delay: Math.random() * 8,
+      // 每10个星星中有1个是特殊的旋转星星
+      isSpecial: index % 10 === 0,
     }));
     setStarPositions(stars);
   }, []);
 
   return (
     <div className={`couple-mode ${isDarkMode ? "dark-mode" : "light-mode"}`}>
-      {/* 星空背景 */}
+      {/* 梵高风格星空背景 - 旋转的星星和月亮 */}
       <div className="starry-sky">
         {starPositions.map((star, index) => (
           <div
             key={index}
-            className="star"
+            className={star.isSpecial ? "heart-star" : "star"}
             style={{
               top: star.top,
               left: star.left,
@@ -49,8 +50,17 @@ const CoupleMode = () => {
               opacity: star.opacity,
               animationDelay: `${star.delay}s`,
             }}
-          />
+          >
+            {star.isSpecial ? "⭐" : ""}
+          </div>
         ))}
+      </div>
+
+      {/* 梵高风格的漩涡云朵动画 */}
+      <div className="clouds-container">
+        <div className="cloud cloud-1"></div>
+        <div className="cloud cloud-2"></div>
+        <div className="cloud cloud-3"></div>
       </div>
 
       {/* 情侣头像和名字显示在右上方 */}
@@ -110,32 +120,31 @@ const coupleNav = css`
   z-index: 10;
   max-width: 1200px;
   margin: 0 auto;
-  padding: 2rem 1rem;
+  padding: 1.5rem 1rem;
 
   .nav-container {
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
     align-items: center;
-    gap: 1rem;
+    gap: 0.8rem;
 
     @media (max-width: 768px) {
-      gap: 0.8rem;
+      gap: 0.6rem;
     }
 
     @media (max-width: 480px) {
-      flex-direction: column;
-      gap: 0.6rem;
+      gap: 0.5rem;
     }
   }
 
   .back-link {
-    margin-top: 1rem;
-    order: 10; /* 确保返回按钮在最后 */
+    margin-left: 1rem;
 
-    @media (max-width: 480px) {
-      margin-top: 0.5rem;
-      order: 0; /* 在移动端放在最前面 */
+    @media (max-width: 768px) {
+      margin-left: 0;
+      width: 100%;
+      order: 10;
     }
   }
 `;
@@ -144,75 +153,80 @@ const navLink = (isActive: boolean) => css`
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 0.5rem;
+  gap: 0.4rem;
   text-decoration: none;
-  padding: 1.2rem 1rem;
-  border-radius: 15px;
-  color: #f0e6d6;
+  padding: 0.3rem 0.9rem;
+  border-radius: 7px;
+  color: #3b3a37ff;
   font-weight: 500;
   background: ${isActive
-    ? "rgba(249, 224, 118, 0.3)"
-    : "rgba(255, 255, 255, 0.1)"};
+    ? "rgba(249, 224, 118, 0.35)"
+    : "rgba(255, 255, 255, 0.12)"};
   border: 1px solid
-    ${isActive ? "rgba(249, 224, 118, 0.5)" : "rgba(255, 255, 255, 0.2)"};
-  backdrop-filter: blur(10px);
-  transition: all 0.3s ease;
-  min-height: 80px;
-  width: auto;
+    ${isActive ? "rgba(249, 224, 118, 0.6)" : "rgba(255, 255, 255, 0.25)"};
+  backdrop-filter: blur(12px);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  min-width: 90px;
   box-shadow: ${isActive
-    ? "0 8px 25px rgba(249, 224, 118, 0.2)"
-    : "0 4px 15px rgba(0, 0, 0, 0.1)"};
+    ? "0 6px 20px rgba(249, 224, 118, 0.25), 0 0 0 1px rgba(249, 224, 118, 0.1) inset"
+    : "0 3px 12px rgba(0, 0, 0, 0.15)"};
 
   .nav-icon {
-    font-size: 1.5rem;
+    font-size: 1.4rem;
     filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+    transition: transform 0.3s ease;
 
     @media (max-width: 768px) {
-      font-size: 1.3rem;
+      font-size: 1.2rem;
     }
   }
 
   .nav-text {
-    font-size: 0.9rem;
+    font-size: 0.85rem;
     text-align: center;
     line-height: 1.2;
+    white-space: nowrap;
 
     @media (max-width: 768px) {
-      font-size: 0.8rem;
-    }
-
-    @media (max-width: 480px) {
       font-size: 0.75rem;
     }
   }
 
   &:hover {
-    background: rgba(249, 224, 118, 0.4);
-    border-color: rgba(249, 224, 118, 0.6);
-    transform: translateY(-3px);
-    box-shadow: 0 12px 30px rgba(249, 224, 118, 0.3);
+    background: rgba(249, 224, 118, 0.45);
+    border-color: rgba(249, 224, 118, 0.7);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(249, 224, 118, 0.35);
     color: #fff;
+
+    .nav-icon {
+      transform: scale(1.1);
+    }
+  }
+
+  &:active {
+    transform: translateY(0);
   }
 
   &.back-link {
-    background: rgba(231, 76, 60, 0.2);
-    border-color: rgba(231, 76, 60, 0.4);
-    max-width: 200px;
+    background: rgba(231, 76, 60, 0.25);
+    border-color: rgba(231, 76, 60, 0.5);
 
     &:hover {
       background: rgba(231, 76, 60, 0.4);
-      border-color: rgba(231, 76, 60, 0.6);
+      border-color: rgba(231, 76, 60, 0.7);
+      box-shadow: 0 8px 25px rgba(231, 76, 60, 0.35);
     }
   }
 
   @media (max-width: 768px) {
-    padding: 1rem 0.8rem;
-    min-height: 70px;
+    padding: 0.85rem 0.75rem;
+    min-width: 80px;
   }
 
   @media (max-width: 480px) {
-    padding: 0.8rem 0.6rem;
-    min-height: 60px;
+    padding: 0.7rem 0.6rem;
+    min-width: 70px;
     gap: 0.3rem;
   }
 `;
@@ -223,24 +237,39 @@ const coupleHeaderContainer = css`
   top: 1rem;
   right: 1rem;
   z-index: 100;
-  background: rgba(255, 255, 255, 0.1);
-  backdrop-filter: blur(10px);
-  border-radius: 15px;
-  padding: 0.5rem;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(15px);
+  border-radius: 16px;
+  padding: 0.6rem;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15),
+    0 0 0 1px rgba(255, 255, 255, 0.1) inset;
+  transition: all 0.3s ease;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.2);
+    box-shadow: 0 6px 25px rgba(0, 0, 0, 0.2);
+  }
 
   @media (max-width: 768px) {
     top: 0.5rem;
     right: 0.5rem;
-    padding: 0.3rem;
+    padding: 0.4rem;
   }
 `;
 
 const mainContent = css`
-  margin-top: 20px;
+  margin-top: 1rem;
   position: relative;
   z-index: 5;
+  padding: 0 1rem;
+  max-width: 1400px;
+  margin-left: auto;
+  margin-right: auto;
+
+  @media (max-width: 768px) {
+    padding: 0 0.5rem;
+  }
 `;
 
 export default CoupleMode;

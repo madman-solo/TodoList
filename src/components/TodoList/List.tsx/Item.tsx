@@ -81,6 +81,28 @@ ItemProps) => {
   const [isEditing, setIsEditing] = useState(false);
   const [editContent, setEditContent] = useState(content);
 
+  // 处理表情拖放
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    const emoji = e.dataTransfer.getData("text/plain");
+    if (emoji) {
+      // 获取点击位置相对于输入框的位置
+      const target = e.target as HTMLElement;
+      const span = target.closest(".todo-item")?.querySelector("span");
+
+      if (span && span.textContent) {
+        // 在当前内容后添加表情
+        const newContent = `${content} ${emoji}`;
+        onUpdate(id, newContent);
+      }
+    }
+  };
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = "copy";
+  };
+
   // 拖拽样式
   const style = {
     transform: CSS.Transform.toString(transform),
@@ -97,8 +119,9 @@ ItemProps) => {
         isDragging ? "dragging" : ""
       }${isLongPress ? "long-press" : ""}`}
       {...attributes}
-      {...attributes}
       {...combinedListeners}
+      onDrop={handleDrop}
+      onDragOver={handleDragOver}
     >
       <input
         type="checkbox"

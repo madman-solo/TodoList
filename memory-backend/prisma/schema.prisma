@@ -135,3 +135,16 @@ model CoupleEvent {
   createdAt DateTime       @default(now())
   updatedAt DateTime       @updatedAt
 }
+
+// 用户活跃度表
+model UserActivity {
+  id        String   @id @default(uuid())
+  userId    String
+  date      DateTime // 日期（精确到天）
+  hours     Float    // 在线时长（小时）
+  coupleId  String?  // 关联的情侣ID
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([userId, date])
+}
