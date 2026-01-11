@@ -13,19 +13,30 @@ const MyTables: React.FC = () => {
   // 初始化表格数据
   useEffect(() => {
     const savedData = loadTableData("weekly-summary");
+    const partnerName = coupleRelation?.partner?.name || "对方";
+    const newHeaders = ["周数", "我的总结", `${partnerName}的总结`, "改进之处"];
+
     if (savedData) {
-      setTableData(savedData);
+      // 检测旧表头并自动更新
+      const needsUpdate =
+        savedData.headers[1] === "我的任务" ||
+        savedData.headers[2]?.includes("任务");
+
+      if (needsUpdate) {
+        console.log("[MyTables] 检测到旧表头，自动更新为新表头");
+        // 保留行数据，只更新表头
+        const updatedData = {
+          headers: newHeaders,
+          rows: savedData.rows,
+        };
+        setTableData(updatedData);
+        saveTableData("weekly-summary", updatedData);
+      } else {
+        // 表头正确，直接使用
+        setTableData(savedData);
+      }
     } else {
       // 创建默认的一周双方总结表
-      const partnerName = coupleRelation?.partner?.name || "对方";
-
-      const headers = [
-        "#",
-        "周数",
-        "我的总结",
-        `${partnerName}的总结`,
-        "改进之处",
-      ];
       const today = new Date();
       const rows = [];
       for (let i = 6; i >= 0; i--) {
@@ -43,7 +54,7 @@ const MyTables: React.FC = () => {
         ][date.getDay()];
         rows.push([`${dateStr} ${weekDay}`, "", "", ""]);
       }
-      const newData = { headers, rows };
+      const newData = { headers: newHeaders, rows };
       setTableData(newData);
       saveTableData("weekly-summary", newData);
     }

@@ -156,20 +156,11 @@ const navLink = (isActive: boolean) => css`
   gap: 0.4rem;
   text-decoration: none;
   padding: 0.3rem 0.9rem;
-  border-radius: 7px;
   color: #3b3a37ff;
   font-weight: 500;
-  background: ${isActive
-    ? "rgba(249, 224, 118, 0.35)"
-    : "rgba(255, 255, 255, 0.12)"};
-  border: 1px solid
-    ${isActive ? "rgba(249, 224, 118, 0.6)" : "rgba(255, 255, 255, 0.25)"};
+
   backdrop-filter: blur(12px);
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   min-width: 90px;
-  box-shadow: ${isActive
-    ? "0 6px 20px rgba(249, 224, 118, 0.25), 0 0 0 1px rgba(249, 224, 118, 0.1) inset"
-    : "0 3px 12px rgba(0, 0, 0, 0.15)"};
 
   .nav-icon {
     font-size: 1.4rem;
@@ -193,14 +184,11 @@ const navLink = (isActive: boolean) => css`
   }
 
   &:hover {
-    background: rgba(249, 224, 118, 0.45);
-    border-color: rgba(249, 224, 118, 0.7);
     transform: translateY(-2px);
-    box-shadow: 0 8px 25px rgba(249, 224, 118, 0.35);
-    color: #fff;
+    color: #3e410d;
 
     .nav-icon {
-      transform: scale(1.1);
+      transform: scale(1.2);
     }
   }
 

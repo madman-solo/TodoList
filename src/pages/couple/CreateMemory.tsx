@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { FaArrowLeft, FaEllipsisV } from "react-icons/fa";
 import { useThemeStore } from "../../store";
@@ -19,6 +19,10 @@ const CreateMemory = () => {
   const [currentDate, setCurrentDate] = useState("");
   const [showOptions, setShowOptions] = useState(false);
   const [albumId, setAlbumId] = useState("");
+  const [coverImage, setCoverImage] = useState<string>("");
+  const [editableContent, setEditableContent] = useState("");
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const editableRef = useRef<HTMLDivElement>(null);
   // 获取当前URL的参数对象
   const params = new URLSearchParams(window.location.search);
   // 获取当前时间
@@ -32,6 +36,14 @@ const CreateMemory = () => {
       const saved = localStorage.getItem("pageInput");
       if (saved) {
         setAlbumName(saved);
+      }
+      const savedImage = localStorage.getItem("pageImage");
+      if (savedImage) {
+        setCoverImage(savedImage);
+      }
+      const savedContent = localStorage.getItem("pageEditableContent");
+      if (savedContent) {
+        setEditableContent(savedContent);
       }
     }
   }, []);
@@ -53,6 +65,40 @@ const CreateMemory = () => {
     navigate("/memories");
   };
 
+  // 处理图片上传
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        const imageData = reader.result as string;
+        setCoverImage(imageData);
+        localStorage.setItem("pageImage", imageData);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  // 触发文件选择
+  const handleCoverClick = () => {
+    fileInputRef.current?.click();
+  };
+
+  // 处理可编辑区域的点击事件
+  const handleEditableClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    editableRef.current?.focus();
+  };
+
+  // 处理可编辑区域内容变化
+  const handleEditableInput = () => {
+    if (editableRef.current) {
+      const content = editableRef.current.innerText;
+      setEditableContent(content);
+      localStorage.setItem("pageEditableContent", content);
+    }
+  };
+
   // 保存相册
   const saveAlbum = () => {
     if (!albumName.trim()) return;
@@ -62,6 +108,7 @@ const CreateMemory = () => {
       name: albumName.trim(),
       date: new Date().toISOString(),
       folderId: "all", // 默认保存到全部
+      coverImage: coverImage || undefined,
     };
 
     // 保存到本地存储
@@ -69,6 +116,11 @@ const CreateMemory = () => {
     const albums = JSON.parse(savedAlbums) as Album[];
     albums.push(newAlbum);
     localStorage.setItem("memories", JSON.stringify(albums));
+
+    // 清除临时存储
+    localStorage.removeItem("pageInput");
+    localStorage.removeItem("pageImage");
+    localStorage.removeItem("pageEditableContent");
 
     navigate("/memories");
   };
@@ -78,6 +130,7 @@ const CreateMemory = () => {
   const handleOptionClick = (option: string) => {
     setShowOptions(false);
     localStorage.setItem("pageInput", albumName);
+    localStorage.setItem("pageEditableContent", editableContent);
     switch (option) {
       case "style":
         // 跳转到更换样式页面
@@ -146,9 +199,53 @@ const CreateMemory = () => {
 
         <p className="current-date">{currentDate}</p>
 
-        <div className="album-cover-upload">
-          <div className="default-cover">
-            <div className="plus-icon">+</div>
+        {/* 可编辑区域 */}
+        <div
+          ref={editableRef}
+          contentEditable
+          suppressContentEditableWarning
+          onClick={handleEditableClick}
+          onInput={handleEditableInput}
+          className="editable-content-area"
+          style={{
+            minHeight: "100px",
+            padding: "15px",
+            margin: "15px 0",
+            border: "1px solid #ddd",
+            borderRadius: "8px",
+            outline: "none",
+            cursor: "text",
+            lineHeight: "1.6",
+            fontSize: "14px",
+          }}
+          data-placeholder="点击此处输入内容..."
+        >
+          {editableContent}
+        </div>
+
+        <div className="album-cover-upload" onClick={handleCoverClick}>
+          <input
+            type="file"
+            ref={fileInputRef}
+            accept="image/*"
+            onChange={handleImageUpload}
+            style={{ display: "none" }}
+          />
+          <div className="default-cover" style={{ cursor: "pointer" }}>
+            {coverImage ? (
+              <img
+                src={coverImage}
+                alt="Album cover"
+                style={{
+                  width: "100%",
+                  height: "100%",
+                  objectFit: "cover",
+                  borderRadius: "10px",
+                }}
+              />
+            ) : (
+              <div className="plus-icon">+</div>
+            )}
           </div>
           <p>点击添加封面照片</p>
         </div>

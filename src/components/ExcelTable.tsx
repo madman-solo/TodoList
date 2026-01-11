@@ -56,6 +56,11 @@ const ExcelTable: React.FC<ExcelTableProps> = ({
   // 输入框引用
   const inputRef = useRef<HTMLInputElement>(null);
 
+  // 添加列对话框状态
+  const [showAddColumnDialog, setShowAddColumnDialog] = useState(false);
+  const [newColumnName, setNewColumnName] = useState("");
+  const columnNameInputRef = useRef<HTMLInputElement>(null);
+
   // 当编辑单元格改变时，自动聚焦输入框
   useEffect(() => {
     if (editingCell && inputRef.current) {
@@ -63,6 +68,13 @@ const ExcelTable: React.FC<ExcelTableProps> = ({
       inputRef.current.select();
     }
   }, [editingCell]);
+
+  // 当显示添加列对话框时，聚焦输入框
+  useEffect(() => {
+    if (showAddColumnDialog && columnNameInputRef.current) {
+      columnNameInputRef.current.focus();
+    }
+  }, [showAddColumnDialog]);
 
   // 更新单元格值
   const updateCell = (row: number, col: number, value: string) => {
@@ -181,16 +193,44 @@ const ExcelTable: React.FC<ExcelTableProps> = ({
     onChange?.(newData);
   };
 
-  // 添加新列
-  const addColumn = () => {
-    const newHeader = String.fromCharCode(65 + tableData.headers.length);
+  // 显示添加列对话框
+  const showAddColumnPrompt = () => {
+    setShowAddColumnDialog(true);
+    setNewColumnName("");
+  };
+
+  // 确认添加新列
+  const confirmAddColumn = () => {
+    const columnName =
+      newColumnName.trim() || `列${tableData.headers.length + 1}`;
     const newRows = tableData.rows.map((row) => [...row, ""]);
     const newData = {
-      headers: [...tableData.headers, newHeader],
+      headers: [...tableData.headers, columnName],
       rows: newRows,
     };
     setTableData(newData);
     onChange?.(newData);
+    setShowAddColumnDialog(false);
+    setNewColumnName("");
+  };
+
+  // 取消添加列
+  const cancelAddColumn = () => {
+    setShowAddColumnDialog(false);
+    setNewColumnName("");
+  };
+
+  // 处理列名输入框的回车键
+  const handleColumnNameKeyDown = (
+    e: React.KeyboardEvent<HTMLInputElement>
+  ) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      confirmAddColumn();
+    } else if (e.key === "Escape") {
+      e.preventDefault();
+      cancelAddColumn();
+    }
   };
 
   // 删除行
@@ -246,7 +286,7 @@ const ExcelTable: React.FC<ExcelTableProps> = ({
             <span>添加行</span>
           </button>
           <button
-            onClick={addColumn}
+            onClick={showAddColumnPrompt}
             className="px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded-lg font-medium shadow-md hover:shadow-lg transition-all duration-200 flex items-center gap-2"
           >
             <span>➕</span>
@@ -396,6 +436,51 @@ const ExcelTable: React.FC<ExcelTableProps> = ({
               <p>
                 • Enter: 向下移动 | Tab: 向右移动 | 方向键: 导航 | Esc: 退出编辑
               </p>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* 添加列对话框 */}
+      {showAddColumnDialog && (
+        <div
+          className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+          onClick={(e) => {
+            if (e.target === e.currentTarget) {
+              cancelAddColumn();
+            }
+          }}
+        >
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-2xl p-6 w-96 max-w-[90%]">
+            <h3 className="text-xl font-bold text-gray-800 dark:text-gray-100 mb-4">
+              ✏️ 添加新列
+            </h3>
+            <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
+              请输入新列的名称（留空则使用默认名称）
+            </p>
+            <input
+              ref={columnNameInputRef}
+              type="text"
+              value={newColumnName}
+              onChange={(e) => setNewColumnName(e.target.value)}
+              onKeyDown={handleColumnNameKeyDown}
+              placeholder={`列${tableData.headers.length + 1}`}
+              className="w-full px-4 py-2 border-2 border-gray-300 dark:border-gray-600 rounded-lg focus:border-green-500 focus:outline-none bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500"
+              maxLength={50}
+            />
+            <div className="flex justify-end gap-3 mt-6">
+              <button
+                onClick={cancelAddColumn}
+                className="px-4 py-2 bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 rounded-lg font-medium transition-all duration-200"
+              >
+                取消
+              </button>
+              <button
+                onClick={confirmAddColumn}
+                className="px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded-lg font-medium shadow-md hover:shadow-lg transition-all duration-200"
+              >
+                确认添加
+              </button>
             </div>
           </div>
         </div>

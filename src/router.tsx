@@ -82,46 +82,6 @@ const router = createBrowserRouter([
       },
       { path: "daily", element: <DailySelection /> }, // 每日精选
       { path: "daily/comments", element: <CommentPage /> }, // 评论页面
-      {
-        path: "couple",
-        element: (
-          <CoupleRouteGuard>
-            <CoupleMode />
-          </CoupleRouteGuard>
-        ),
-        children: [
-          { index: true, element: <FutureList /> },
-          {
-            path: "table",
-            element: <TableNavigation />,
-            children: [
-              { index: true, element: <MyTables /> },
-              { path: "my-tables", element: <MyTables /> },
-              { path: "store", element: <TableStore /> },
-              { path: "activity", element: <Activity /> },
-            ],
-          },
-          { path: "games", element: <CoupleGames /> },
-        ],
-      },
-      {
-        path: "wish",
-        element: (
-          <CoupleRouteGuard>
-            <WishList />
-          </CoupleRouteGuard>
-        ),
-      },
-      {
-        path: "memories",
-        element: (
-          <CoupleRouteGuard>
-            <MemoriesAlbum />
-          </CoupleRouteGuard>
-        ),
-      },
-      { path: "memories/create", element: <CreateMemory /> },
-      { path: "memories/folders", element: <SelectFolder /> },
       { path: "focus", element: <FocusPage /> },
       { path: "notifications", element: <NotificationsPage /> },
       { path: "diary", element: <DiaryPage /> },
@@ -133,6 +93,68 @@ const router = createBrowserRouter([
       { path: "settings", element: <PreferenceSettings /> },
       { path: "profile", element: <Profile /> },
     ],
+  },
+  // 情侣模式独立路由（不使用Layout）
+  {
+    path: "/couple",
+    element: (
+      <ProtectedRoute>
+        <CoupleRouteGuard>
+          <CoupleMode />
+        </CoupleRouteGuard>
+      </ProtectedRoute>
+    ),
+    children: [
+      { index: true, element: <FutureList /> },
+      {
+        path: "table",
+        element: <TableNavigation />,
+        children: [
+          { index: true, element: <MyTables /> },
+          { path: "my-tables", element: <MyTables /> },
+          { path: "store", element: <TableStore /> },
+          { path: "activity", element: <Activity /> },
+        ],
+      },
+      { path: "games", element: <CoupleGames /> },
+    ],
+  },
+  // 情侣模式相关的独立页面
+  {
+    path: "/wish",
+    element: (
+      <ProtectedRoute>
+        <CoupleRouteGuard>
+          <WishList />
+        </CoupleRouteGuard>
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: "/memories",
+    element: (
+      <ProtectedRoute>
+        <CoupleRouteGuard>
+          <MemoriesAlbum />
+        </CoupleRouteGuard>
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: "/memories/create",
+    element: (
+      <ProtectedRoute>
+        <CreateMemory />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: "/memories/folders",
+    element: (
+      <ProtectedRoute>
+        <SelectFolder />
+      </ProtectedRoute>
+    ),
   },
 ]);
 

@@ -23,6 +23,7 @@ const CoupleHeader: React.FC = () => {
     updatePartnerAvatar,
   } = useCoupleStore();
   const [partnerInfo, setPartnerInfo] = useState<PartnerInfo | null>(null);
+  const [showModal, setShowModal] = useState(false); // 控制弹窗显示
 
   // 头像上传input引用
   const userAvatarInputRef = useRef<HTMLInputElement>(null);
@@ -177,113 +178,180 @@ const CoupleHeader: React.FC = () => {
   }
 
   return (
-    <div className="couple-header-compact">
-      <div className="couple-avatars-horizontal">
-        {/* 对方头像 - 显示对方姓名 */}
-        <div className="user-avatar-item">
-          <div
-            className="user-avatar-small"
-            onClick={handlePartnerAvatarClick}
-            style={{ cursor: "not-allowed", opacity: 0.9 }}
-            title="对方的头像"
-          >
+    <>
+      {/* 紧凑图标显示 */}
+      <div
+        className="couple-icon-compact"
+        onClick={() => setShowModal(true)}
+        title="查看情侣信息"
+      >
+        <div className="couple-avatars-icon">
+          {/* 对方头像 */}
+          <div className="avatar-mini">
             {partnerInfo?.avatar ? (
               <img src={partnerInfo.avatar} alt={partnerInfo.name} />
             ) : (
               <span>{partnerInfo?.name?.charAt(0).toUpperCase() || "?"}</span>
             )}
           </div>
-          {/* 显示对方姓名 */}
-          <span
-            className="user-name-small"
-            title={partnerInfo?.name || "加载中..."}
-          >
-            {partnerInfo?.name || "加载中..."}
-          </span>
-        </div>
-
-        {/* 爱心连接 */}
-        <div className="love-connector-small">
-          <span
-            className={`heart-icon-small ${
-              wsConnected ? "connected" : "disconnected"
-            }`}
-          >
-            💕
-          </span>
-        </div>
-
-        {/* 当前用户头像 - 可点击上传 */}
-        <div className="user-avatar-item">
-          <div
-            className="user-avatar-small clickable"
-            onClick={() => userAvatarInputRef.current?.click()}
-            title="点击上传头像"
-            style={{ cursor: "pointer" }}
-          >
+          {/* 爱心图标 */}
+          <div className="heart-mini">💕</div>
+          {/* 当前用户头像 */}
+          <div className="avatar-mini">
             {user.avatar ? (
               <img src={user.avatar} alt={user.name} />
             ) : (
               <span>{user.name.charAt(0).toUpperCase()}</span>
             )}
           </div>
-          {/* 隐藏的文件上传input */}
-          <input
-            ref={userAvatarInputRef}
-            type="file"
-            accept="image/*"
-            style={{ display: "none" }}
-            onChange={handleUserAvatarUpload}
-          />
-          <span className="user-name-small" title={user.name}>
-            {user.name}
-          </span>
         </div>
+        {/* 连接状态指示点 */}
+        <div
+          className={`status-indicator ${wsConnected ? "online" : "offline"}`}
+        ></div>
       </div>
 
-      {/* 连接状态指示 */}
-      <div className="connection-status-small">
-        <span
-          className={`status-dot-small ${wsConnected ? "online" : "offline"}`}
-        ></span>
-        <span className="status-text-small">
-          {wsConnected ? "同步" : "连接中"}
-        </span>
-      </div>
+      {/* 点击后显示的弹窗 */}
+      {showModal && (
+        <div
+          className="couple-modal-overlay"
+          onClick={() => setShowModal(false)}
+        >
+          <div
+            className="couple-modal-content"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* 关闭按钮 */}
+            <button
+              className="modal-close-btn"
+              onClick={() => setShowModal(false)}
+            >
+              ✕
+            </button>
 
-      {/* 解除绑定按钮 */}
-      <button
-        className="unbind-button-small"
-        onClick={async () => {
-          if (window.confirm("确定要解除情侣绑定吗？这将删除所有共同事件。")) {
-            try {
-              // 通知Socket服务器解绑
-              if (coupleId) {
-                socketService.notifyUnbind(coupleId);
-              }
+            {/* 情侣容器内容 */}
+            <div className="couple-header-compact">
+              <div className="couple-avatars-horizontal">
+                {/* 对方头像 - 显示对方姓名 */}
+                <div className="user-avatar-item">
+                  <div
+                    className="user-avatar-small"
+                    onClick={handlePartnerAvatarClick}
+                    style={{ cursor: "not-allowed", opacity: 0.9 }}
+                    title="对方的头像"
+                  >
+                    {partnerInfo?.avatar ? (
+                      <img src={partnerInfo.avatar} alt={partnerInfo.name} />
+                    ) : (
+                      <span>
+                        {partnerInfo?.name?.charAt(0).toUpperCase() || "?"}
+                      </span>
+                    )}
+                  </div>
+                  {/* 显示对方姓名 */}
+                  <span
+                    className="user-name-small"
+                    title={partnerInfo?.name || "加载中..."}
+                  >
+                    {partnerInfo?.name || "加载中..."}
+                  </span>
+                </div>
 
-              // 断开Socket连接
-              socketService.disconnect();
+                {/* 爱心连接 */}
+                <div className="love-connector-small">
+                  <span
+                    className={`heart-icon-small ${
+                      wsConnected ? "connected" : "disconnected"
+                    }`}
+                  >
+                    💕
+                  </span>
+                </div>
 
-              // 调用解绑API
-              await unbindCouple();
+                {/* 当前用户头像 - 可点击上传 */}
+                <div className="user-avatar-item">
+                  <div
+                    className="user-avatar-small clickable"
+                    onClick={() => userAvatarInputRef.current?.click()}
+                    title="点击上传头像"
+                    style={{ cursor: "pointer" }}
+                  >
+                    {user.avatar ? (
+                      <img src={user.avatar} alt={user.name} />
+                    ) : (
+                      <span>{user.name.charAt(0).toUpperCase()}</span>
+                    )}
+                  </div>
+                  {/* 隐藏的文件上传input */}
+                  <input
+                    ref={userAvatarInputRef}
+                    type="file"
+                    accept="image/*"
+                    style={{ display: "none" }}
+                    onChange={handleUserAvatarUpload}
+                  />
+                  <span className="user-name-small" title={user.name}>
+                    {user.name}
+                  </span>
+                </div>
+              </div>
 
-              // 清空本地数据
-              clearCoupleData();
+              {/* 连接状态指示 */}
+              <div className="connection-status-small">
+                <span
+                  className={`status-dot-small ${
+                    wsConnected ? "online" : "offline"
+                  }`}
+                ></span>
+                <span className="status-text-small">
+                  {wsConnected ? "同步" : "连接中"}
+                </span>
+              </div>
 
-              // 跳转回绑定页面
-              navigate("/couple");
-            } catch (error) {
-              console.error("解除绑定失败:", error);
-              alert("解除绑定失败，请重试");
-            }
-          }
-        }}
-        title="解除绑定"
-      >
-        🔓
-      </button>
-    </div>
+              {/* 解除绑定按钮 */}
+              <button
+                className="unbind-button-small"
+                onClick={async () => {
+                  if (
+                    window.confirm(
+                      "确定要解除情侣绑定吗？这将删除所有共同事件。"
+                    )
+                  ) {
+                    try {
+                      // 通知Socket服务器解绑
+                      if (coupleId) {
+                        socketService.notifyUnbind(coupleId);
+                      }
+
+                      // 断开Socket连接
+                      socketService.disconnect();
+
+                      // 调用解绑API
+                      await unbindCouple();
+
+                      // 清空本地数据
+                      clearCoupleData();
+
+                      // 关闭弹窗
+                      setShowModal(false);
+
+                      // 跳转回绑定页面
+                      navigate("/couple");
+                    } catch (error) {
+                      console.error("解除绑定失败:", error);
+                      alert("解除绑定失败，请重试");
+                    }
+                  }
+                }}
+                title="解除绑定"
+              >
+                🔓
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </>
   );
 };
 

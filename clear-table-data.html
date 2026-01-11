@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>检查并清空TableData</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        max-width: 800px;
+        margin: 50px auto;
+        padding: 20px;
+        background: #f5f5f5;
+      }
+      .container {
+        background: white;
+        padding: 30px;
+        border-radius: 8px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      }
+      h1 {
+        color: #333;
+        border-bottom: 2px solid #4caf50;
+        padding-bottom: 10px;
+      }
+      .info-box {
+        background: #e8f5e9;
+        border-left: 4px solid #4caf50;
+        padding: 15px;
+        margin: 20px 0;
+        border-radius: 4px;
+      }
+      .warning-box {
+        background: #fff3e0;
+        border-left: 4px solid #ff9800;
+        padding: 15px;
+        margin: 20px 0;
+        border-radius: 4px;
+      }
+      .data-list {
+        background: #f9f9f9;
+        padding: 15px;
+        border-radius: 4px;
+        margin: 15px 0;
+        max-height: 400px;
+        overflow-y: auto;
+      }
+      .data-item {
+        padding: 10px;
+        margin: 5px 0;
+        background: white;
+        border-radius: 4px;
+        border-left: 3px solid #2196f3;
+      }
+      button {
+        background: #4caf50;
+        color: white;
+        border: none;
+        padding: 12px 24px;
+        font-size: 16px;
+        border-radius: 4px;
+        cursor: pointer;
+        margin: 10px 10px 10px 0;
+        transition: background 0.3s;
+      }
+      button:hover {
+        background: #45a049;
+      }
+      button.danger {
+        background: #f44336;
+      }
+      button.danger:hover {
+        background: #da190b;
+      }
+      .result {
+        margin-top: 20px;
+        padding: 15px;
+        border-radius: 4px;
+        display: none;
+      }
+      .result.success {
+        background: #d4edda;
+        color: #155724;
+        border: 1px solid #c3e6cb;
+      }
+      .result.error {
+        background: #f8d7da;
+        color: #721c24;
+        border: 1px solid #f5c6cb;
+      }
+      .stats {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 15px;
+        margin: 20px 0;
+      }
+      .stat-card {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 20px;
+        border-radius: 8px;
+        text-align: center;
+      }
+      .stat-number {
+        font-size: 32px;
+        font-weight: bold;
+        margin: 10px 0;
+      }
+      .stat-label {
+        font-size: 14px;
+        opacity: 0.9;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>🗂️ TableData 数据管理</h1>
+
+      <div class="info-box">
+        <strong>📋 说明：</strong>
+        此工具用于检查和清空存储在localStorage中的TableData数据。
+      </div>
+
+      <div class="stats" id="stats">
+        <!-- 统计信息将动态插入这里 -->
+      </div>
+
+      <div id="dataList" class="data-list">
+        <!-- 数据列表将动态插入这里 -->
+      </div>
+
+      <div style="margin-top: 20px">
+        <button onclick="checkData()">🔍 检查数据</button>
+        <button onclick="clearData()" class="danger">
+          🗑️ 清空所有TableData
+        </button>
+        <button onclick="exportData()">📤 导出数据</button>
+      </div>
+
+      <div id="result" class="result"></div>
+    </div>
+
+    <script>
+      const STORAGE_KEY_PREFIX = "couple_table_";
+
+      // 检查数据
+      function checkData() {
+        const result = document.getElementById("result");
+        const dataList = document.getElementById("dataList");
+        const stats = document.getElementById("stats");
+
+        try {
+          const tableData = [];
+          let totalSize = 0;
+
+          // 遍历localStorage
+          for (let i = 0; i < localStorage.length; i++) {
+            const key = localStorage.key(i);
+            if (key && key.startsWith(STORAGE_KEY_PREFIX)) {
+              const value = localStorage.getItem(key);
+              const size = new Blob([value]).size;
+              totalSize += size;
+
+              try {
+                const parsed = JSON.parse(value);
+                tableData.push({
+                  key: key,
+                  size: size,
+                  timestamp: parsed.timestamp
+                    ? new Date(parsed.timestamp).toLocaleString("zh-CN")
+                    : "未知",
+                  version: parsed.version || "未知",
+                  userId: parsed.userId || "未设置",
+                  coupleId: parsed.coupleId || "未设置",
+                  rowCount: parsed.data?.rows?.length || 0,
+                  headerCount: parsed.data?.headers?.length || 0,
+                });
+              } catch (e) {
+                tableData.push({
+                  key: key,
+                  size: size,
+                  error: "数据格式错误",
+                });
+              }
+            }
+          }
+
+          // 显示统计信息
+          stats.innerHTML = `
+                    <div class="stat-card">
+                        <div class="stat-label">表格数量</div>
+                        <div class="stat-number">${tableData.length}</div>
+                    </div>
+                    <div class="stat-card" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
+                        <div class="stat-label">总数据大小</div>
+                        <div class="stat-number">${(totalSize / 1024).toFixed(
+                          2
+                        )} KB</div>
+                    </div>
+                `;
+
+          // 显示数据列表
+          if (tableData.length > 0) {
+            dataList.innerHTML =
+              "<h3>📊 找到的TableData数据：</h3>" +
+              tableData
+                .map(
+                  (item, index) => `
+                            <div class="data-item">
+                                <strong>第 ${index + 1} 项：</strong> ${
+                    item.key
+                  }<br>
+                                <small>
+                                    ${
+                                      item.error
+                                        ? `❌ ${item.error}`
+                                        : `
+                                        📅 时间: ${item.timestamp} | 
+                                        📦 大小: ${(item.size / 1024).toFixed(
+                                          2
+                                        )} KB | 
+                                        📝 版本: ${item.version}<br>
+                                        👤 用户ID: ${item.userId} | 
+                                        💑 情侣ID: ${item.coupleId} | 
+                                        📊 行数: ${item.rowCount} | 
+                                        📋 列数: ${item.headerCount}
+                                    `
+                                    }
+                                </small>
+                            </div>
+                        `
+                )
+                .join("");
+
+            result.className = "result success";
+            result.style.display = "block";
+            result.innerHTML = `✅ 检查完成！找到 <strong>${
+              tableData.length
+            }</strong> 个TableData项，总大小 <strong>${(
+              totalSize / 1024
+            ).toFixed(2)} KB</strong>`;
+          } else {
+            dataList.innerHTML =
+              '<div class="info-box">✨ 当前没有TableData数据</div>';
+            result.className = "result success";
+            result.style.display = "block";
+            result.innerHTML = "✅ 检查完成！没有找到TableData数据";
+          }
+        } catch (error) {
+          result.className = "result error";
+          result.style.display = "block";
+          result.innerHTML = `❌ 检查失败：${error.message}`;
+          console.error("检查数据失败:", error);
+        }
+      }
+
+      // 清空数据
+      function clearData() {
+        if (!confirm("⚠️ 确定要清空所有TableData数据吗？此操作不可恢复！")) {
+          return;
+        }
+
+        const result = document.getElementById("result");
+
+        try {
+          let count = 0;
+          const keysToRemove = [];
+
+          // 收集所有需要删除的键
+          for (let i = 0; i < localStorage.length; i++) {
+            const key = localStorage.key(i);
+            if (key && key.startsWith(STORAGE_KEY_PREFIX)) {
+              keysToRemove.push(key);
+            }
+          }
+
+          // 删除
+          keysToRemove.forEach((key) => {
+            localStorage.removeItem(key);
+            count++;
+          });
+
+          result.className = "result success";
+          result.style.display = "block";
+          result.innerHTML = `✅ 成功清空 <strong>${count}</strong> 个TableData项！`;
+
+          // 重新检查数据
+          setTimeout(() => {
+            checkData();
+          }, 500);
+        } catch (error) {
+          result.className = "result error";
+          result.style.display = "block";
+          result.innerHTML = `❌ 清空失败：${error.message}`;
+          console.error("清空数据失败:", error);
+        }
+      }
+
+      // 导出数据
+      function exportData() {
+        try {
+          const exportObj = {};
+          let count = 0;
+
+          for (let i = 0; i < localStorage.length; i++) {
+            const key = localStorage.key(i);
+            if (key && key.startsWith(STORAGE_KEY_PREFIX)) {
+              exportObj[key] = JSON.parse(localStorage.getItem(key));
+              count++;
+            }
+          }
+
+          if (count === 0) {
+            alert("没有数据可导出");
+            return;
+          }
+
+          const jsonStr = JSON.stringify(exportObj, null, 2);
+          const blob = new Blob([jsonStr], { type: "application/json" });
+          const url = URL.createObjectURL(blob);
+
+          const a = document.createElement("a");
+          a.href = url;
+          a.download = `tabledata_backup_${
+            new Date().toISOString().split("T")[0]
+          }.json`;
+          a.click();
+
+          URL.revokeObjectURL(url);
+
+          const result = document.getElementById("result");
+          result.className = "result success";
+          result.style.display = "block";
+          result.innerHTML = `✅ 成功导出 <strong>${count}</strong> 个TableData项！`;
+        } catch (error) {
+          const result = document.getElementById("result");
+          result.className = "result error";
+          result.style.display = "block";
+          result.innerHTML = `❌ 导出失败：${error.message}`;
+          console.error("导出数据失败:", error);
+        }
+      }
+
+      // 页面加载时自动检查
+      window.addEventListener("load", () => {
+        checkData();
+      });
+    </script>
+  </body>
+</html>
