@@ -10,7 +10,7 @@ const TableNavigation: React.FC = () => {
   // 导航项配置
   const navItems = [
     { id: "my-tables", label: "我的表格", path: "/couple/table/my-tables" },
-    { id: "table-store", label: "表格商店", path: "/couple/table/store" },
+    { id: "store", label: "表格商店", path: "/couple/table/store" },
     { id: "activity", label: "活跃度", path: "/couple/table/activity" },
   ];
 
@@ -24,6 +24,8 @@ const TableNavigation: React.FC = () => {
     }
 
     const activeItem = navItems.find((item) => currentPath.includes(item.id));
+    console.log(activeItem); //表格商店返回的是 undefined？因为路径是 /couple/table/store，而不是 /couple/table/table-store，刚才把id写错了
+
     return activeItem?.id || "my-tables";
   };
 

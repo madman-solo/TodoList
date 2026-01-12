@@ -34,6 +34,7 @@ import IconPage from "./pages/background/IconPage.tsx";
 import CreateBirthdayPage from "./pages/outermy/CreateBirthdayPage.tsx";
 import MemoriesAlbum from "./pages/couple/MemoriesAlbum.tsx";
 import CreateMemory from "./pages/couple/CreateMemory.tsx";
+import EditMemory from "./pages/couple/EditMemory.tsx";
 import SelectFolder from "./pages/couple/SelectFolder.tsx";
 import MyThemes from "./pages/intermy/MyThemes.tsx";
 import MyFonts from "./pages/intermy/MyFonts.tsx";
@@ -145,6 +146,14 @@ const router = createBrowserRouter([
     element: (
       <ProtectedRoute>
         <CreateMemory />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: "/memories/edit/:albumId",
+    element: (
+      <ProtectedRoute>
+        <EditMemory />
       </ProtectedRoute>
     ),
   },

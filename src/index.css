@@ -2560,6 +2560,24 @@ body {
   min-height: 60vh;
 }
 
+/* 相册内容预览样式 */
+.album-content-preview {
+  font-size: 0.85rem;
+  color: #888;
+  margin: 0.5rem 0;
+  line-height: 1.4;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+
+.dark-mode .album-content-preview {
+  color: #999;
+}
+
 .empty-state {
   display: flex;
   flex-direction: column;
@@ -2641,6 +2659,7 @@ body {
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
   transition: all 0.3s ease;
   position: relative;
+  cursor: pointer;
 }
 
 .dark-mode .album-card {
@@ -2650,6 +2669,11 @@ body {
 .album-card:hover {
   transform: translateY(-5px);
   box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+}
+
+.album-card:active {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
 }
 
 .delete-album-btn {
@@ -2965,6 +2989,12 @@ body {
     height: 140px;
   }
 
+  .album-content-preview {
+    font-size: 0.8rem;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+  }
+
   .folders-nav {
     padding: 0.8rem 0.5rem;
   }
@@ -2988,6 +3018,11 @@ body {
     min-width: auto;
     width: calc(100% - 2rem);
   }
+
+  /* 移动端点击反馈优化 */
+  .album-card:active {
+    transform: scale(0.98);
+  }
 }
 
 @media (max-width: 480px) {
@@ -2998,6 +3033,20 @@ body {
 
   .album-cover {
     height: 120px;
+  }
+
+  .album-content-preview {
+    font-size: 0.75rem;
+    -webkit-line-clamp: 1;
+    line-clamp: 1;
+  }
+
+  .album-name {
+    font-size: 1rem;
+  }
+
+  .album-date {
+    font-size: 0.8rem;
   }
 
   .header-title {
@@ -3088,7 +3137,7 @@ body {
   content: attr(data-placeholder);
   color: #999;
   pointer-events: none;
-  position: absolute;
+  display: block;
 }
 
 .dark-mode .editable-content-area:empty:before {

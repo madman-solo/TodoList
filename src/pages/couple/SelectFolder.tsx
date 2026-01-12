@@ -13,6 +13,7 @@ interface Album {
   date: string;
   folderId: string;
   coverImage?: string; // 可选属性用?标记
+  content?: string; // 相册内容文字
 }
 
 const SelectFolder = () => {
@@ -23,8 +24,10 @@ const SelectFolder = () => {
   const [showCreateFolder, setShowCreateFolder] = useState(false);
   const [newFolderName, setNewFolderName] = useState("文件夹");
 
-  // 获取当前相册ID
-  const albumId = new URLSearchParams(location.search).get("albumId") || "";
+  // 获取当前相册ID和模式
+  const searchParams = new URLSearchParams(location.search);
+  const albumId = searchParams.get("albumId") || "";
+  const mode = searchParams.get("mode") || "create"; // create 或 edit
 
   // 加载文件夹
   useEffect(() => {
@@ -34,9 +37,13 @@ const SelectFolder = () => {
     }
   }, []);
 
-  // 返回创建相册页面
+  // 返回上一页
   const goBack = () => {
-    navigate(`/memories/create?albumId=${albumId}`);
+    if (mode === "edit") {
+      navigate(`/memories/edit/${albumId}`);
+    } else {
+      navigate(`/memories/create?albumId=${albumId}`);
+    }
   };
 
   // 选择文件夹
@@ -46,13 +53,17 @@ const SelectFolder = () => {
     // 更新相册的文件夹ID
     const savedAlbums = localStorage.getItem("memories") || "[]";
     const albums: Album[] = JSON.parse(savedAlbums);
-    // 此时album会被正确推断为Album类型
     const updatedAlbums = albums.map((album: Album) =>
       album.id === albumId ? { ...album, folderId: folderId } : album
     );
     localStorage.setItem("memories", JSON.stringify(updatedAlbums));
 
-    navigate(`/memories/create?albumId=${albumId}`);
+    // 根据模式返回不同页面
+    if (mode === "edit") {
+      navigate(`/memories/edit/${albumId}`);
+    } else {
+      navigate(`/memories/create?albumId=${albumId}`);
+    }
   };
 
   // 创建新文件夹

@@ -19,6 +19,7 @@ interface Album {
   date: string;
   folderId: string;
   coverImage?: string;
+  content?: string; // 相册内容文字
 }
 
 // 定义文件夹类型
@@ -103,6 +104,11 @@ const MemoriesAlbum = () => {
 
   const goToCreateAlbum = () => {
     navigate("/memories/create");
+  };
+
+  // 跳转到相册编辑页面
+  const goToEditAlbum = (albumId: string) => {
+    navigate(`/memories/edit/${albumId}`);
   };
 
   const realFolders = Array.from(
@@ -248,10 +254,13 @@ const MemoriesAlbum = () => {
           <div className="albums-grid">
             {filteredAlbums.map((album) => (
               <div key={album.id} className="album-item">
-                <div className="album-card">
+                <div className="album-card" onClick={() => goToEditAlbum(album.id)}>
                   <button
                     className="delete-album-btn"
-                    onClick={() => handleDeleteAlbum(album.id)}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleDeleteAlbum(album.id);
+                    }}
                     title="删除相册"
                   >
                     <FaTrash size={12} />
@@ -272,6 +281,12 @@ const MemoriesAlbum = () => {
 
                   <div className="album-info">
                     <h4 className="album-name">{album.name}</h4>
+                    {album.content && (
+                      <p className="album-content-preview">
+                        {album.content.substring(0, 50)}
+                        {album.content.length > 50 ? "..." : ""}
+                      </p>
+                    )}
                     <p className="album-date">
                       {new Date(album.date).toLocaleDateString("zh-CN", {
                         year: "numeric",
