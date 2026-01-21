@@ -5,6 +5,8 @@ import { css } from "@emotion/react";
 import { useCoupleStore } from "../../store/coupleStore";
 import type { CoupleEvent } from "../../store/coupleStore";
 import { useRealtimeCollaboration } from "../../hooks/useRealtimeCollaboration";
+import { useUserStore } from "../../store";
+import { trackActivity } from "../../utils/activityTracker";
 
 const FutureList = () => {
   const {
@@ -15,6 +17,7 @@ const FutureList = () => {
     loadEvents,
     setEvents,
   } = useCoupleStore();
+  const { user } = useUserStore();
 
   const [newItem, setNewItem] = useState("");
   const [positions, setPositions] = useState<
@@ -132,6 +135,11 @@ const FutureList = () => {
 
         setNewItem("");
 
+        // 追踪活跃度
+        if (user?.id) {
+          trackActivity(String(user.id), "futureList");
+        }
+
         // 广播添加事件
         broadcastUpdate({ type: "future-list", data: newEvent, action: "add" });
       } catch (error) {
@@ -143,6 +151,11 @@ const FutureList = () => {
   const handleDeleteItem = async (eventId: string) => {
     try {
       await deleteEvent(eventId);
+
+      // 追踪活跃度
+      if (user?.id) {
+        trackActivity(String(user.id), "futureList");
+      }
 
       // 广播删除事件
       broadcastUpdate({

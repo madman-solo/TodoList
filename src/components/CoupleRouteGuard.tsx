@@ -20,26 +20,24 @@ const CoupleRouteGuard: React.FC<CoupleRouteGuardProps> = ({ children }) => {
   useEffect(() => {
     const validateCoupleBinding = async () => {
       try {
-        // 第一重校验：localStorage
-        const localCoupleId = localStorage.getItem("coupleId");
-        const localIsCoupleBound = localStorage.getItem("isCoupleBound");
+        setIsLoading(true);
 
-        if (!localCoupleId || localIsCoupleBound !== "true") {
-          console.log("localStorage校验失败：未绑定");
-          setIsValidated(false);
-          setIsLoading(false);
-          return;
-        }
-
-        // 第二重校验：后端验证
+        // 强制从后端重新加载最新的情侣关系状态
         await loadCoupleRelation();
 
-        // 验证后端返回的数据与localStorage一致
+        // 获取最新的 store 状态
         const storeState = useCoupleStore.getState();
-        if (storeState.isCoupleBound && storeState.coupleId === localCoupleId) {
+
+        // 验证是否已绑定
+        if (storeState.isCoupleBound && storeState.coupleId && storeState.coupleRelation) {
+          console.log("情侣关系验证成功:", {
+            coupleId: storeState.coupleId,
+            partnerId: storeState.partnerId,
+            isCoupleBound: storeState.isCoupleBound,
+          });
           setIsValidated(true);
         } else {
-          console.log("后端校验失败：coupleId不匹配或未绑定");
+          console.log("情侣关系验证失败：未绑定或数据不完整");
           setIsValidated(false);
         }
       } catch (error) {
@@ -94,8 +92,15 @@ const CoupleRouteGuard: React.FC<CoupleRouteGuardProps> = ({ children }) => {
       >
         <CoupleBinding
           onBindingSuccess={() => {
-            // 绑定成功后重新加载情侣关系
-            loadCoupleRelation();
+            // 绑定成功后重新验证状态
+            setIsLoading(true);
+            loadCoupleRelation().then(() => {
+              const storeState = useCoupleStore.getState();
+              if (storeState.isCoupleBound && storeState.coupleId) {
+                setIsValidated(true);
+              }
+              setIsLoading(false);
+            });
           }}
         />
       </div>

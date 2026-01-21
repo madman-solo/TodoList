@@ -131,12 +131,9 @@ const MyPage = () => {
               reader.onloadend = async () => {
                 const base64String = reader.result as string;
 
-                // 【头像双向同步】更新本地store
-                updateUser({ avatar: base64String });
-
-                // 同步到服务器
+                // 【修复】先同步到服务器，成功后再更新本地store
                 try {
-                  await fetch(
+                  const response = await fetch(
                     `http://localhost:3001/api/users/${user.id}/avatar`,
                     {
                       method: "PUT",
@@ -150,6 +147,13 @@ const MyPage = () => {
                     }
                   );
 
+                  if (!response.ok) {
+                    throw new Error("头像上传失败");
+                  }
+
+                  // 【修复】服务器保存成功后，再更新本地store
+                  updateUser({ avatar: base64String });
+
                   // 【头像双向同步】通过WebSocket通知情侣模式页面
                   if (coupleId && socketService.isConnected()) {
                     socketService.send({
@@ -161,9 +165,12 @@ const MyPage = () => {
                     });
                     console.log("个人页面头像更新已同步到情侣模式");
                   }
+
+                  alert("头像上传成功");
                 } catch (error) {
                   console.error("头像上传失败:", error);
                   alert("头像上传失败，请重试");
+                  // 【修复】失败时不更新本地store，保持原头像
                 }
               };
               reader.readAsDataURL(file);

@@ -27,6 +27,7 @@ import FocusPage from "./pages/outermy/FocusPage.tsx";
 import AnniversaryPage from "./pages/outermy/AnniversaryPage.tsx";
 import SchedulePage from "./pages/outermy/SchedulePage.tsx";
 import CreateDiaryPage from "./pages/outermy/CreateDiaryPage.tsx";
+import EditDiaryPage from "./pages/outermy/EditDiaryPage.tsx";
 import BackgroundContent from "./pages/background/BackgroundContent.tsx";
 import ThemePage from "./pages/background/ThemePage.tsx";
 import FontPage from "./pages/background/FontPage.tsx";
@@ -87,6 +88,7 @@ const router = createBrowserRouter([
       { path: "notifications", element: <NotificationsPage /> },
       { path: "diary", element: <DiaryPage /> },
       { path: "diary/create", element: <CreateDiaryPage /> },
+      { path: "diary/edit/:id", element: <EditDiaryPage /> },
       { path: "birthday", element: <BirthdayPage /> },
       { path: "birthday/create", element: <CreateBirthdayPage /> },
       { path: "anniversary", element: <AnniversaryPage /> },

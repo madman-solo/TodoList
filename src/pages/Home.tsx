@@ -1,40 +1,64 @@
-import { useTodoStore } from "../store";
+import { useTodoStore, useEmojiStore } from "../store";
 import TodoList from "../components/index.tsx";
 import Input from "../components/TodoList/Input/index.tsx";
 import MoodTracker from "../components/MoodTracker.tsx";
 import { useThemeStore } from "../store";
-import { useState } from "react";
 
 const Home = () => {
-  const { addTodo, todos } = useTodoStore();
+  const { addTodo } = useTodoStore();
   const { isDarkMode } = useThemeStore();
-  const [isDragOver, setIsDragOver] = useState(false);
+  const { droppedEmojis, addEmoji, removeEmoji } = useEmojiStore();
 
-  // 处理拖拽进入待办区域
-  const handleDragOver = (e: React.DragEvent) => {
-    e.preventDefault();
-    setIsDragOver(true);
-  };
-
-  // 处理拖拽离开待办区域
-  const handleDragLeave = () => {
-    setIsDragOver(false);
-  };
-
-  // 处理放置心情到待办列表
+  // 处理拖拽放置
   const handleDrop = (e: React.DragEvent) => {
     e.preventDefault();
-    setIsDragOver(false);
-    const moodEmoji = e.dataTransfer.getData("text/plain");
-    if (moodEmoji) {
-      addTodo(`${moodEmoji} 今日心情记录`);
+    const emoji = e.dataTransfer.getData("text/plain");
+    if (emoji) {
+      const newEmoji = {
+        id: Date.now().toString(),
+        emoji,
+        x: e.pageX,
+        y: e.pageY,
+      };
+      addEmoji(newEmoji);
     }
+  };
+
+  // 允许拖拽
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
   };
 
   return (
     <div
       className={isDarkMode ? "dark-mode home-page" : "light-mode home-page"}
+      onDrop={handleDrop}
+      onDragOver={handleDragOver}
+      style={{ position: "relative", minHeight: "100vh" }}
     >
+      {/* 渲染放置的表情包 */}
+      {droppedEmojis.map((item) => (
+        <div
+          key={item.id}
+          style={{
+            position: "absolute",
+            left: item.x,
+            top: item.y,
+            fontSize: "32px",
+            cursor: "pointer",
+            zIndex: 1000,
+            transform: "translate(-50%, -50%)",
+            animation: "emojiDrop 0.5s ease-out",
+            userSelect: "none",
+          }}
+          onClick={() => {
+            removeEmoji(item.id);
+          }}
+        >
+          {item.emoji}
+        </div>
+      ))}
+
       <div className="home-page">
         {/* 左侧固定添加区域 */}
         <div className="add-section">
@@ -49,39 +73,8 @@ const Home = () => {
           <p className="header-subtitle">记录每一个重要时刻</p>
         </div>
 
-        <div
-          onDragOver={handleDragOver}
-          onDragLeave={handleDragLeave}
-          onDrop={handleDrop}
-          style={{
-            border: isDragOver
-              ? "2px dashed #fea93aff"
-              : "2px dashed transparent",
-            borderRadius: "8px",
-            padding: "10px",
-            transition: "all 0.3s",
-            backgroundColor: isDragOver
-              ? "rgba(254, 169, 58, 0.1)"
-              : "transparent",
-            minHeight: todos.length === 0 ? "200px" : "auto",
-            display: "flex",
-            alignItems: todos.length === 0 ? "center" : "flex-start",
-            justifyContent: todos.length === 0 ? "center" : "flex-start",
-          }}
-        >
-          {todos.length === 0 && isDragOver ? (
-            <div
-              style={{
-                textAlign: "center",
-                color: "#fea93aff",
-                fontSize: "14px",
-              }}
-            >
-              📌 松开鼠标添加心情到待办清单
-            </div>
-          ) : (
-            <TodoList />
-          )}
+        <div>
+          <TodoList />
         </div>
       </div>
     </div>

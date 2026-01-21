@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { useUserStore } from "../store";
+import { useUserStore, useTodoStore, useEmojiStore } from "../store";
 import { useThemeStore } from "../store";
 import { authAPI } from "../services/api";
 
@@ -8,9 +8,12 @@ const Login = () => {
   const { isDarkMode } = useThemeStore();
   const [name, setName] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const { login } = useUserStore();
+  const todoStore = useTodoStore();
+  const emojiStore = useEmojiStore();
   const navigate = useNavigate();
 
   // 组件挂载时清空输入框
@@ -47,12 +50,16 @@ const Login = () => {
       // 保存认证令牌
       localStorage.setItem("authToken", response.token);
 
-      // 【修复】登录到本地存储，包含头像字段
+      // 【修复】不再清除待办事项和表情包数据，保持用户数据持久化
+      // 这样用户重新登录后可以看到之前的待办事项和表情包
+
+      // 【修复】登录到本地存储，包含头像字段和注册时间
       login({
         id: response.user.id,
         name: response.user.name,
         password: response.user.password,
-        avatar: response.user.avatar, // 加载头像
+        avatar: response.user.avatar,
+        createdAt: response.user.createdAt, // 【修复】保存注册时间
       });
 
       // 清空输入框
@@ -91,13 +98,40 @@ const Login = () => {
         </div>
         <div>
           <label>密码</label>
-          <input
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            autoComplete="new-password"
-            required
-          />
+          <div style={{ position: 'relative' }}>
+            <input
+              type={showPassword ? "text" : "password"}
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              autoComplete="new-password"
+              required
+              style={{ paddingRight: '40px' }}
+            />
+            <button
+              type="button"
+              onClick={() => setShowPassword(!showPassword)}
+              style={{
+                position: 'absolute',
+                right: '10px',
+                top: '50%',
+                transform: 'translateY(-50%)',
+                background: 'none',
+                border: 'none',
+                cursor: 'pointer',
+                fontSize: '20px',
+                padding: '0',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                width: '24px',
+                height: '24px',
+                lineHeight: '1'
+              }}
+              aria-label={showPassword ? "隐藏密码" : "显示密码"}
+            >
+              {showPassword ? '👁️' : '👁️‍🗨️'}
+            </button>
+          </div>
         </div>
         <button type="submit" disabled={loading}>
           {loading ? "登录中..." : "登录"}

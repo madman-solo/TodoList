@@ -229,6 +229,7 @@ app.post("/api/auth/register", async (req, res) => {
         name: user.name,
         password: user.password,
         avatar: user.avatar, // 【修复】返回头像字段
+        createdAt: user.createdAt, // 【修复】返回注册时间
       },
     });
   } catch (error) {
@@ -247,7 +248,7 @@ app.post("/api/auth/login", async (req, res) => {
       return res.status(400).json({ error: "用户名和密码不能为空" });
     }
 
-    // 查找用户（包含头像字段）
+    // 查找用户（包含头像字段和注册时间）
     const user = await prisma.user.findUnique({
       where: { name },
       select: {
@@ -255,6 +256,7 @@ app.post("/api/auth/login", async (req, res) => {
         name: true,
         password: true,
         avatar: true, // 【修复】登录时加载头像
+        createdAt: true, // 【修复】登录时加载注册时间
       },
     });
 
@@ -276,6 +278,7 @@ app.post("/api/auth/login", async (req, res) => {
         name: user.name,
         password: user.password,
         avatar: user.avatar, // 【修复】返回头像数据
+        createdAt: user.createdAt, // 【修复】返回注册时间
       },
     });
   } catch (error) {
@@ -419,7 +422,10 @@ app.put("/api/users/:userId/avatar", async (req, res) => {
     const { userId } = req.params;
     const { avatar } = req.body;
 
+    console.log("收到头像更新请求:", { userId, avatarLength: avatar?.length });
+
     if (!avatar) {
+      console.log("头像数据为空");
       return res.status(400).json({ error: "头像数据不能为空" });
     }
 
@@ -434,10 +440,12 @@ app.put("/api/users/:userId/avatar", async (req, res) => {
       },
     });
 
+    console.log("头像更新成功:", { userId, avatarSaved: !!updatedUser.avatar });
     res.json(updatedUser);
   } catch (error) {
     console.error("更新用户头像失败:", error);
-    res.status(500).json({ error: "更新用户头像失败" });
+    console.error("错误详情:", error.message);
+    res.status(500).json({ error: "更新用户头像失败", details: error.message });
   }
 });
 

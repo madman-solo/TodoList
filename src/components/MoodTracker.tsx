@@ -2,7 +2,6 @@
 import { useState } from "react";
 import { FaStar } from "react-icons/fa";
 import { css } from "@emotion/react";
-import { useTodoStore } from "../store";
 
 // 默认本地表情包
 const DEFAULT_LOCAL_EMOJIS = ["😊", "😂", "😍", "😎", "🥰", "😭"];
@@ -14,9 +13,6 @@ const MoodTracker = () => {
   const [emojiSource, setEmojiSource] = useState<"local" | "api">("local");
   const [emojis, setEmojis] = useState<string[]>(DEFAULT_LOCAL_EMOJIS);
   const [isLoadingEmojis, setIsLoadingEmojis] = useState(false);
-  const [showTip, setShowTip] = useState(false);
-
-  const { todos } = useTodoStore();
 
   // 从在线API获取表情包
   const fetchOnlineEmojis = async () => {
@@ -57,11 +53,6 @@ const MoodTracker = () => {
   // 选择表情
   const handleEmojiSelect = (emoji: string) => {
     setMood(emoji);
-    // 选择心情后显示提示
-    if (todos.length > 0) {
-      setShowTip(true);
-      setTimeout(() => setShowTip(false), 3000);
-    }
   };
 
   // 处理表情拖拽开始
@@ -107,11 +98,9 @@ const MoodTracker = () => {
                 key={index}
                 css={emojiButton(mood === emoji)}
                 onClick={() => handleEmojiSelect(emoji)}
-                draggable={todos.length > 0}
+                draggable={true}
                 onDragStart={(e) => handleEmojiDragStart(e, emoji)}
-                style={{
-                  cursor: todos.length > 0 ? "grab" : "pointer",
-                }}
+                style={{ cursor: "grab" }}
               >
                 {emoji}
               </button>
@@ -123,11 +112,6 @@ const MoodTracker = () => {
           <div css={selectedMoodStyle}>
             <span>当前心情：</span>
             <span css={selectedEmojiStyle}>{mood}</span>
-            {todos.length > 0 && (
-              <span css={dragHintStyle}>
-                {showTip ? "💡 拖拽表情到待办清单试试" : ""}
-              </span>
-            )}
           </div>
         )}
       </div>
@@ -257,34 +241,10 @@ const selectedMoodStyle = css`
   gap: 8px;
   font-size: 13px;
   color: #666;
-  transition: all 0.3s;
-  user-select: none;
-
-  &:active {
-    cursor: grabbing;
-  }
 `;
 
 const selectedEmojiStyle = css`
   font-size: 14px;
-`;
-
-const dragHintStyle = css`
-  margin-left: auto;
-  font-size: 12px;
-  color: #fea93aff;
-  font-weight: 500;
-  animation: pulse 2s infinite;
-
-  @keyframes pulse {
-    0%,
-    100% {
-      opacity: 0.6;
-    }
-    50% {
-      opacity: 1;
-    }
-  }
 `;
 
 const blessingsSection = css`

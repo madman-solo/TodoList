@@ -25,7 +25,6 @@ const TableNavigation: React.FC = () => {
 
     const activeItem = navItems.find((item) => currentPath.includes(item.id));
     console.log(activeItem); //表格商店返回的是 undefined？因为路径是 /couple/table/store，而不是 /couple/table/table-store，刚才把id写错了
-
     return activeItem?.id || "my-tables";
   };
 

@@ -38,12 +38,20 @@ const Profile = () => {
     };
   }, [user, updateUser]);
 
-  // 计算创建天数（示例）
-  const creationDate = new Date();
-  creationDate.setDate(creationDate.getDate() - 30); // 假设30天前创建
-  const daysSinceCreation = Math.floor(
-    (new Date().getTime() - creationDate.getTime()) / (1000 * 60 * 60 * 24)
-  );
+  // 计算创建天数（从用户注册时间开始）
+  const calculateDaysSinceCreation = () => {
+    if (!user?.createdAt) {
+      // 如果没有注册时间，返回0或使用当前时间作为起点
+      return 0;
+    }
+    const creationDate = new Date(user.createdAt);
+    const today = new Date();
+    const diffTime = today.getTime() - creationDate.getTime();
+    const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+    return diffDays;
+  };
+
+  const daysSinceCreation = calculateDaysSinceCreation();
 
   return (
     <div css={container(isDarkMode)}>
@@ -101,12 +109,9 @@ const Profile = () => {
                     reader.onloadend = async () => {
                       const base64String = reader.result as string;
 
-                      // 【头像双向同步】更新本地store
-                      updateUser({ avatar: base64String });
-
-                      // 同步到服务器
+                      // 【修复】先同步到服务器，成功后再更新本地store
                       try {
-                        await fetch(
+                        const response = await fetch(
                           `http://localhost:3001/api/users/${user.id}/avatar`,
                           {
                             method: "PUT",
@@ -120,6 +125,13 @@ const Profile = () => {
                           }
                         );
 
+                        if (!response.ok) {
+                          throw new Error("头像上传失败");
+                        }
+
+                        // 【修复】服务器保存成功后，再更新本地store
+                        updateUser({ avatar: base64String });
+
                         // 【头像双向同步】通过WebSocket通知其他页面
                         if (coupleId && socketService.isConnected()) {
                           socketService.send({
@@ -131,9 +143,12 @@ const Profile = () => {
                           });
                           console.log("个人页面头像更新已同步到其他页面");
                         }
+
+                        alert("头像上传成功");
                       } catch (error) {
                         console.error("头像上传失败:", error);
                         alert("头像上传失败，请重试");
+                        // 【修复】失败时不更新本地store，保持原头像
                       }
                     };
                     reader.readAsDataURL(file);
@@ -217,7 +232,7 @@ const Profile = () => {
                 icon: <FaCog size={18} />,
               },
               {
-                name: "课程表",
+                name: "日程管理",
                 path: "/schedule",
                 icon: <FaCog size={18} />,
               },

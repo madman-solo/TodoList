@@ -2,13 +2,12 @@
 
 import { Outlet, Link, useLocation } from "react-router-dom";
 import { css } from "@emotion/react";
-import { useState, useEffect } from "react";
+import { useState, useEffect, memo } from "react";
 import { useThemeStore } from "../store";
 import CoupleHeader from "../components/CoupleHeader";
 
-const CoupleMode = () => {
-  const location = useLocation();
-  const { isDarkMode } = useThemeStore();
+// 星空背景组件 - 使用 memo 避免不必要的重新渲染
+const StarryBackground = memo(() => {
   const [starPositions, setStarPositions] = useState<
     Array<{
       top: string;
@@ -20,23 +19,20 @@ const CoupleMode = () => {
     }>
   >([]);
 
-  // 生成梵高风格的星空效果 - 更多更密集的星星
   useEffect(() => {
-    const stars = Array.from({ length: 200 }, (_, index) => ({
+    const stars = Array.from({ length: 50 }, (_, index) => ({
       top: `${Math.random() * 100}vh`,
       left: `${Math.random() * 100}vw`,
       size: Math.random() * 3 + 1,
       opacity: Math.random() * 0.8 + 0.2,
       delay: Math.random() * 8,
-      // 每10个星星中有1个是特殊的旋转星星
       isSpecial: index % 10 === 0,
     }));
     setStarPositions(stars);
   }, []);
 
   return (
-    <div className={`couple-mode ${isDarkMode ? "dark-mode" : "light-mode"}`}>
-      {/* 梵高风格星空背景 - 旋转的星星和月亮 */}
+    <>
       <div className="starry-sky">
         {starPositions.map((star, index) => (
           <div
@@ -56,12 +52,25 @@ const CoupleMode = () => {
         ))}
       </div>
 
-      {/* 梵高风格的漩涡云朵动画 */}
       <div className="clouds-container">
         <div className="cloud cloud-1"></div>
         <div className="cloud cloud-2"></div>
         <div className="cloud cloud-3"></div>
       </div>
+    </>
+  );
+});
+
+StarryBackground.displayName = 'StarryBackground';
+
+const CoupleMode = () => {
+  const location = useLocation();
+  const { isDarkMode } = useThemeStore();
+
+  return (
+    <div className={`couple-mode ${isDarkMode ? "dark-mode" : "light-mode"}`}>
+      {/* 梵高风格星空背景 */}
+      <StarryBackground />
 
       {/* 情侣头像和名字显示在右上方 */}
       <div css={coupleHeaderContainer}>
@@ -158,14 +167,15 @@ const navLink = (isActive: boolean) => css`
   padding: 0.3rem 0.9rem;
   color: #3b3a37ff;
   font-weight: 500;
-
-  backdrop-filter: blur(12px);
+  background: ${isActive ? 'rgba(255, 255, 255, 0.3)' : 'rgba(255, 255, 255, 0.15)'};
+  border-radius: 12px;
+  transition: all 0.2s ease;
   min-width: 90px;
 
   .nav-icon {
     font-size: 1.4rem;
     filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
-    transition: transform 0.3s ease;
+    transition: transform 0.15s ease;
 
     @media (max-width: 768px) {
       font-size: 1.2rem;

@@ -1,75 +1,61 @@
 /** @jsxImportSource @emotion/react */
 import React, { useState } from "react";
 import { css } from "@emotion/react";
-
-interface TableTemplate {
-  id: string;
-  name: string;
-  description: string;
-  icon: string;
-  category: string;
-}
+import { useNavigate } from "react-router-dom";
+import { tableTemplates } from "../../utils/tableTemplates";
+import { saveTable, setActiveTableId, getAllTables } from "../../utils/tableManager";
+import ExcelTable from "../../components/ExcelTable";
+import { useUserStore } from "../../store";
+import { trackActivity } from "../../utils/activityTracker";
 
 const TableStore: React.FC = () => {
-  // 选中的模板ID状态
-  const [selectedTemplateId, setSelectedTemplateId] = useState<string | null>(
-    null
-  );
-
-  // 表格模板数据
-  const templates: TableTemplate[] = [
-    {
-      id: "weekly-summary",
-      name: "一周双方总结表",
-      description: "记录每周双方的想法",
-      icon: "📊",
-      category: "日常",
-    },
-    {
-      id: "monthly-plan",
-      name: "月度计划表",
-      description: "规划每月的目标和计划",
-      icon: "📅",
-      category: "计划",
-    },
-    {
-      id: "budget-tracker",
-      name: "预算跟踪表",
-      description: "记录和管理双方的收支情况",
-      icon: "💰",
-      category: "财务",
-    },
-    {
-      id: "travel-plan",
-      name: "旅行计划表",
-      description: "规划旅行行程和预算",
-      icon: "✈️",
-      category: "旅行",
-    },
-    {
-      id: "fitness-log",
-      name: "健身打卡表",
-      description: "记录每日运动和健身情况",
-      icon: "💪",
-      category: "健康",
-    },
-    {
-      id: "reading-list",
-      name: "阅读清单",
-      description: "记录想读和已读的书籍",
-      icon: "📚",
-      category: "学习",
-    },
-  ];
+  const navigate = useNavigate();
+  const { user } = useUserStore();
+  const [selectedTemplateId, setSelectedTemplateId] = useState<string | null>(null);
 
   const handleCardClick = (templateId: string) => {
     setSelectedTemplateId(templateId);
   };
 
   const handleUseTemplate = (templateId: string, e: React.MouseEvent) => {
-    e.stopPropagation(); // 阻止事件冒泡到卡片点击
-    // TODO: 实现模板使用功能
-    alert(`即将使用模板: ${templateId}\n此功能正在开发中...`);
+    e.stopPropagation();
+
+    const template = tableTemplates.find(t => t.id === templateId);
+    if (!template) return;
+
+    // 获取所有已存在的表格
+    const allTables = getAllTables();
+
+    // 计算同一模板已经被使用的次数
+    const sameTemplateCount = allTables.filter(
+      t => t.templateId === template.id
+    ).length;
+
+    // 生成带序号的表格名称
+    const tableName = sameTemplateCount > 0
+      ? `${template.name} #${sameTemplateCount + 1}`
+      : template.name;
+
+    // 创建新的表格记录
+    const newTableId = `table_${Date.now()}`;
+    saveTable({
+      id: newTableId,
+      name: tableName,
+      templateId: template.id,
+      data: template.data,
+      createdAt: new Date().toISOString(),
+    });
+
+    // 设置为当前活跃表格
+    setActiveTableId(newTableId);
+
+    // 追踪活跃度
+    if (user?.id) {
+      trackActivity(String(user.id), "tables");
+    }
+
+    // 跳转到我的表格页面
+    navigate("/couple/table/my-tables");
   };
 
   return (
@@ -80,7 +66,7 @@ const TableStore: React.FC = () => {
       </div>
 
       <div css={styles.grid}>
-        {templates.map((template) => (
+        {tableTemplates.map((template) => (
           <div
             key={template.id}
             css={[
@@ -93,6 +79,18 @@ const TableStore: React.FC = () => {
             <div css={styles.cardContent}>
               <h3 css={styles.cardTitle}>{template.name}</h3>
               <p css={styles.cardDescription}>{template.description}</p>
+
+              {/* 真实的表格预览 */}
+              <div css={styles.tablePreview}>
+                <ExcelTable
+                  initialData={template.data}
+                  onChange={() => {}} // 预览模式，不允许编辑
+                  minRows={template.data.rows.length}
+                  minCols={template.data.headers.length}
+                  readOnly={true}
+                />
+              </div>
+
               <div css={styles.cardFooter}>
                 <span css={styles.category}>{template.category}</span>
                 <button
@@ -192,6 +190,21 @@ const styles = {
     color: #666;
     line-height: 1.6;
     margin: 0;
+  `,
+  tablePreview: css`
+    margin: 16px 0;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    overflow: hidden;
+    max-height: 300px;
+    overflow-y: auto;
+    background: #f9f9f9;
+
+    /* 缩小表格预览的字体 */
+    font-size: 12px;
+
+    /* 禁用表格编辑功能 */
+    pointer-events: none;
   `,
   cardFooter: css`
     display: flex;

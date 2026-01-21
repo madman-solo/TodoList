@@ -2,6 +2,14 @@
 import React, { useState, useEffect } from "react";
 import { css } from "@emotion/react";
 import { useCoupleStore } from "../../store/coupleStore";
+import { useUserStore } from "../../store";
+import {
+  getCoupleActivityData,
+  calculateAverageActivity,
+  scoreToPercentage,
+  getActivityLevel,
+  getActivityColor,
+} from "../../utils/activityTracker";
 
 interface ActivityData {
   date: string;
@@ -11,47 +19,45 @@ interface ActivityData {
 
 const Activity: React.FC = () => {
   const { coupleRelation } = useCoupleStore();
+  const { user } = useUserStore();
   const [activityData, setActivityData] = useState<ActivityData[]>([]);
+  const [myAverage, setMyAverage] = useState(0);
+  const [partnerAverage, setPartnerAverage] = useState(0);
 
-  // 生成最近7天的活跃度数据（模拟数据）
+  // 获取实时活跃度数据
   useEffect(() => {
-    const generateActivityData = () => {
-      const data: ActivityData[] = [];
-      const today = new Date();
+    const loadActivityData = () => {
+      if (!user?.id) return;
 
-      for (let i = 6; i >= 0; i--) {
-        const date = new Date(today);
-        date.setDate(today.getDate() - i);
-        const dateStr = `${date.getMonth() + 1}/${date.getDate()}`;
+      const myUserId = String(user.id);
+      const partnerId = coupleRelation?.partner?.id ? String(coupleRelation.partner.id) : undefined;
 
-        // 生成随机活跃度数据（0-100）
-        data.push({
-          date: dateStr,
-          myActivity: Math.floor(Math.random() * 100),
-          partnerActivity: Math.floor(Math.random() * 100),
-        });
-      }
-
+      // 获取双方最近7天的活跃度数据
+      const data = getCoupleActivityData(myUserId, partnerId, 7);
       setActivityData(data);
+
+      // 计算平均活跃度
+      const myAvg = calculateAverageActivity(myUserId, 7);
+      const partnerAvg = partnerId ? calculateAverageActivity(partnerId, 7) : 0;
+
+      setMyAverage(scoreToPercentage(myAvg));
+      setPartnerAverage(scoreToPercentage(partnerAvg));
     };
 
-    generateActivityData();
-  }, []);
+    loadActivityData();
 
-  // 计算平均活跃度
-  const calculateAverage = (type: "my" | "partner") => {
-    if (activityData.length === 0) return 0;
-    const sum = activityData.reduce(
-      (acc, item) =>
-        acc + (type === "my" ? item.myActivity : item.partnerActivity),
-      0
-    );
-    return Math.round(sum / activityData.length);
-  };
+    // 每30秒刷新一次数据
+    const interval = setInterval(loadActivityData, 30000);
+    return () => clearInterval(interval);
+  }, [user?.id, coupleRelation?.partner?.id]);
 
-  const myAverage = calculateAverage("my");
-  const partnerAverage = calculateAverage("partner");
   const partnerName = coupleRelation?.partner?.name || "对方";
+
+  // 格式化日期显示
+  const formatDate = (dateStr: string) => {
+    const date = new Date(dateStr);
+    return `${date.getMonth() + 1}/${date.getDate()}`;
+  };
 
   return (
     <div css={styles.container}>
@@ -89,37 +95,55 @@ const Activity: React.FC = () => {
         </div>
       </div>
 
-      {/* 活跃度图表 */}
-      <div css={styles.chartContainer}>
-        <h3 css={styles.chartTitle}>最近7天活跃度趋势</h3>
-        <div css={styles.chart}>
+      {/* 热力图 */}
+      <div css={styles.heatmapContainer}>
+        <h3 css={styles.chartTitle}>活跃度热力图</h3>
+        <div css={styles.heatmapGrid}>
           {activityData.map((item, index) => (
-            <div key={index} css={styles.chartItem}>
-              <div css={styles.bars}>
+            <div key={index} css={styles.heatmapDay}>
+              <div css={styles.heatmapLabel}>{formatDate(item.date)}</div>
+              <div css={styles.heatmapCells}>
                 <div
-                  css={[styles.bar, styles.myBar]}
-                  style={{ height: `${item.myActivity}%` }}
-                  title={`我: ${item.myActivity}%`}
-                />
+                  css={styles.heatmapCell}
+                  style={{ backgroundColor: getActivityColor(item.myActivity) }}
+                  title={`我: ${item.myActivity}% - ${getActivityLevel(item.myActivity)}`}
+                >
+                  <span css={styles.heatmapValue}>{item.myActivity}%</span>
+                </div>
                 <div
-                  css={[styles.bar, styles.partnerBar]}
-                  style={{ height: `${item.partnerActivity}%` }}
-                  title={`${partnerName}: ${item.partnerActivity}%`}
-                />
+                  css={styles.heatmapCell}
+                  style={{ backgroundColor: getActivityColor(item.partnerActivity) }}
+                  title={`${partnerName}: ${item.partnerActivity}% - ${getActivityLevel(item.partnerActivity)}`}
+                >
+                  <span css={styles.heatmapValue}>{item.partnerActivity}%</span>
+                </div>
               </div>
-              <div css={styles.chartLabel}>{item.date}</div>
             </div>
           ))}
         </div>
-
-        <div css={styles.legend}>
-          <div css={styles.legendItem}>
-            <div css={[styles.legendColor, styles.myLegend]} />
-            <span>我</span>
-          </div>
-          <div css={styles.legendItem}>
-            <div css={[styles.legendColor, styles.partnerLegend]} />
-            <span>{partnerName}</span>
+        <div css={styles.heatmapLegendContainer}>
+          <span css={styles.heatmapLegendLabel}>活跃度等级：</span>
+          <div css={styles.heatmapLegend}>
+            <div css={styles.heatmapLegendItem}>
+              <div css={styles.heatmapLegendColor} style={{ backgroundColor: "#ecf0f1" }} />
+              <span>很少</span>
+            </div>
+            <div css={styles.heatmapLegendItem}>
+              <div css={styles.heatmapLegendColor} style={{ backgroundColor: "#ffd32a" }} />
+              <span>较低</span>
+            </div>
+            <div css={styles.heatmapLegendItem}>
+              <div css={styles.heatmapLegendColor} style={{ backgroundColor: "#ffa502" }} />
+              <span>一般</span>
+            </div>
+            <div css={styles.heatmapLegendItem}>
+              <div css={styles.heatmapLegendColor} style={{ backgroundColor: "#ff6348" }} />
+              <span>活跃</span>
+            </div>
+            <div css={styles.heatmapLegendItem}>
+              <div css={styles.heatmapLegendColor} style={{ backgroundColor: "#ff4757" }} />
+              <span>非常活跃</span>
+            </div>
           </div>
         </div>
       </div>
@@ -148,6 +172,14 @@ const styles = {
     max-width: 1400px;
     margin: 0 auto;
     padding: 20px;
+
+    @media (max-width: 768px) {
+      padding: 15px;
+    }
+
+    @media (max-width: 480px) {
+      padding: 10px;
+    }
   `,
   header: css`
     text-align: center;
@@ -173,6 +205,11 @@ const styles = {
     grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
     gap: 20px;
     margin-bottom: 40px;
+
+    @media (max-width: 768px) {
+      grid-template-columns: 1fr;
+      gap: 15px;
+    }
   `,
   statCard: css`
     background: white;
@@ -213,13 +250,6 @@ const styles = {
     font-weight: 700;
     color: #333;
   `,
-  chartContainer: css`
-    background: white;
-    border-radius: 16px;
-    padding: 30px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-    margin-bottom: 30px;
-  `,
   chartTitle: css`
     font-size: 20px;
     font-weight: 600;
@@ -227,72 +257,96 @@ const styles = {
     margin: 0 0 30px 0;
     text-align: center;
   `,
-  chart: css`
-    display: flex;
-    justify-content: space-around;
-    align-items: flex-end;
-    height: 300px;
-    padding: 20px 0;
-    border-bottom: 2px solid #e0e0e0;
+  heatmapContainer: css`
+    background: white;
+    border-radius: 16px;
+    padding: 30px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    margin-bottom: 30px;
   `,
-  chartItem: css`
+  heatmapGrid: css`
     display: flex;
     flex-direction: column;
+    gap: 12px;
+    margin-bottom: 20px;
+
+    @media (max-width: 768px) {
+      gap: 10px;
+    }
+  `,
+  heatmapDay: css`
+    display: flex;
     align-items: center;
+    gap: 15px;
+
+    @media (max-width: 480px) {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 8px;
+    }
+  `,
+  heatmapLabel: css`
+    min-width: 60px;
+    font-size: 14px;
+    color: #666;
+    font-weight: 500;
+  `,
+  heatmapCells: css`
+    display: flex;
     gap: 10px;
     flex: 1;
   `,
-  bars: css`
-    display: flex;
-    gap: 8px;
-    align-items: flex-end;
-    height: 100%;
-  `,
-  bar: css`
-    width: 20px;
-    min-height: 10px;
-    border-radius: 4px 4px 0 0;
-    transition: all 0.3s ease;
-    cursor: pointer;
-
-    &:hover {
-      opacity: 0.8;
-    }
-  `,
-  myBar: css`
-    background: linear-gradient(180deg, #667eea 0%, #764ba2 100%);
-  `,
-  partnerBar: css`
-    background: linear-gradient(180deg, #f093fb 0%, #f5576c 100%);
-  `,
-  chartLabel: css`
-    font-size: 12px;
-    color: #666;
-    text-align: center;
-  `,
-  legend: css`
-    display: flex;
-    justify-content: center;
-    gap: 30px;
-    margin-top: 20px;
-  `,
-  legendItem: css`
+  heatmapCell: css`
+    flex: 1;
+    height: 60px;
+    border-radius: 8px;
     display: flex;
     align-items: center;
-    gap: 8px;
+    justify-content: center;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+
+    &:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+  `,
+  heatmapValue: css`
+    font-size: 14px;
+    font-weight: 600;
+    color: #333;
+    text-shadow: 0 1px 2px rgba(255, 255, 255, 0.5);
+  `,
+  heatmapLegendContainer: css`
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 15px;
+    padding-top: 20px;
+    border-top: 1px solid #e0e0e0;
+  `,
+  heatmapLegendLabel: css`
     font-size: 14px;
     color: #666;
+    font-weight: 500;
   `,
-  legendColor: css`
-    width: 20px;
-    height: 12px;
-    border-radius: 2px;
+  heatmapLegend: css`
+    display: flex;
+    gap: 15px;
   `,
-  myLegend: css`
-    background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+  heatmapLegendItem: css`
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    color: #666;
   `,
-  partnerLegend: css`
-    background: linear-gradient(90deg, #f093fb 0%, #f5576c 100%);
+  heatmapLegendColor: css`
+    width: 24px;
+    height: 16px;
+    border-radius: 4px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
   `,
   infoBox: css`
     background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);

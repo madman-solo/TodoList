@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import {
   FaArrowLeft,
@@ -16,13 +16,13 @@ import {
 } from "react-icons/fa";
 import { useThemeStore, useDiaryStore } from "../../store";
 
-const CreateDiaryPage = () => {
+const EditDiaryPage = () => {
   const navigate = useNavigate();
-  const { id } = useParams();
+  const { id } = useParams<{ id: string }>();
   const { isDarkMode } = useThemeStore();
-  const { addDiary, updateDiary, getDiaryById } = useDiaryStore();
+  const { updateDiary, getDiaryById } = useDiaryStore();
 
-  // 如果是编辑模式，加载现有日记
+  // 加载现有日记
   const existingDiary = id ? getDiaryById(id) : null;
 
   const [title, setTitle] = useState(existingDiary?.title || "");
@@ -36,6 +36,7 @@ const CreateDiaryPage = () => {
   const [showWeatherPicker, setShowWeatherPicker] = useState(false);
   const [showColorPicker, setShowColorPicker] = useState(false);
   const [showFontPicker, setShowFontPicker] = useState(false);
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
   const editorRef = useRef<HTMLDivElement>(null);
   const savedSelectionRef = useRef<Range | null>(null);
   const isComposingRef = useRef(false);
@@ -45,9 +46,9 @@ const CreateDiaryPage = () => {
     if (editorRef.current && existingDiary) {
       editorRef.current.innerHTML = existingDiary.content || "";
     }
-  }, []);
+  }, [existingDiary]);
 
-  const moods = ["😊", "😢", "😡", "😴", "🤔", "😍", "😎", "🥳"];
+  const moods = ["😊", "😢", "😡", "😴", "🤔", "😍", "😎", "🥳", "😌", "🤗", "😭", "🥰"];
   const weathers = [
     { value: "sunny", icon: <FaSun />, label: "晴天" },
     { value: "cloudy", icon: <FaCloud />, label: "多云" },
@@ -56,8 +57,36 @@ const CreateDiaryPage = () => {
   const colors = ["#e8b4d9", "#ffb6c1", "#ffc8a2", "#a8e6cf", "#ffd3b6", "#ffaaa5", "#b4a7d6", "#f39c12"];
   const fonts = ["默认", "宋体", "楷体", "黑体", "微软雅黑", "Arial"];
 
+  // 检测未保存的更改
+  useEffect(() => {
+    if (existingDiary) {
+      const hasChanges =
+        title !== existingDiary.title ||
+        content !== existingDiary.content ||
+        mood !== existingDiary.mood ||
+        weather !== existingDiary.weather ||
+        JSON.stringify(tags) !== JSON.stringify(existingDiary.tags) ||
+        JSON.stringify(images) !== JSON.stringify(existingDiary.images);
+      setHasUnsavedChanges(hasChanges);
+    }
+  }, [title, content, mood, weather, tags, images, existingDiary]);
+
+  // 如果日记不存在，返回列表页
+  useEffect(() => {
+    if (!existingDiary) {
+      alert("日记不存在");
+      navigate("/diary");
+    }
+  }, [existingDiary, navigate]);
+
   const goBack = () => {
-    navigate("/diary");
+    if (hasUnsavedChanges) {
+      if (window.confirm("有未保存的更改，确定要离开吗？")) {
+        navigate("/diary");
+      }
+    } else {
+      navigate("/diary");
+    }
   };
 
   const handleAddTag = () => {
@@ -193,32 +222,31 @@ const CreateDiaryPage = () => {
       return;
     }
 
+    if (!id || !existingDiary) {
+      alert("日记ID不存在");
+      return;
+    }
+
     const now = new Date().toISOString();
     const diaryData = {
       title: title.trim() || "无标题日记",
       content: content.trim(),
-      date: existingDiary?.date || new Date().toISOString().split("T")[0],
       mood,
       weather,
       tags,
       images,
-      createdAt: existingDiary?.createdAt || now,
       updatedAt: now,
     };
 
-    if (id && existingDiary) {
-      // 更新现有日记
-      updateDiary(id, diaryData);
-    } else {
-      // 创建新日记
-      addDiary({
-        id: Date.now().toString(),
-        ...diaryData,
-      });
-    }
-
+    updateDiary(id, diaryData);
+    setHasUnsavedChanges(false);
+    alert("保存成功！");
     navigate("/diary");
   };
+
+  if (!existingDiary) {
+    return null;
+  }
 
   return (
     <div className={`create-diary-page ${isDarkMode ? "dark-mode" : ""}`}>
@@ -227,14 +255,30 @@ const CreateDiaryPage = () => {
         <button className="back-btn" onClick={goBack}>
           <FaArrowLeft size={20} />
         </button>
-        <h2>{id ? "编辑日记" : "写日记"}</h2>
-        <button className="save-btn" onClick={saveDiary}>
+        <h2>编辑日记</h2>
+        <button
+          className="save-btn"
+          onClick={saveDiary}
+          disabled={!hasUnsavedChanges}
+          style={{ opacity: hasUnsavedChanges ? 1 : 0.5 }}
+        >
           <FaSave size={20} />
         </button>
       </div>
 
       {/* 日记编辑区 */}
       <div className="diary-editor">
+        {/* 日期显示 */}
+        <div className="diary-date-display">
+          <span>
+            {new Date(existingDiary.date).toLocaleDateString("zh-CN", {
+              year: "numeric",
+              month: "long",
+              day: "numeric",
+            })}
+          </span>
+        </div>
+
         {/* 标题输入 */}
         <input
           type="text"
@@ -466,4 +510,4 @@ const CreateDiaryPage = () => {
   );
 };
 
-export default CreateDiaryPage;
+export default EditDiaryPage;

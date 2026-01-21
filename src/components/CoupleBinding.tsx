@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { useCoupleStore } from "../store/coupleStore";
 import { useUserStore } from "../store";
 import socketService from "../services/socketService";
@@ -8,6 +9,7 @@ interface CoupleBindingProps {
 }
 
 const CoupleBinding: React.FC<CoupleBindingProps> = ({ onBindingSuccess }) => {
+  const navigate = useNavigate();
   const [partnerIdInput, setPartnerIdInput] = useState("");
   const { user } = useUserStore();
   const {
@@ -86,6 +88,8 @@ const CoupleBinding: React.FC<CoupleBindingProps> = ({ onBindingSuccess }) => {
   const handleAccept = async (requestId: string) => {
     try {
       await acceptRequest(requestId);
+      // 重新加载情侣关系以获取最新状态
+      await loadCoupleRelation();
       alert("绑定成功！现在你们可以共同管理情侣事件了");
       onBindingSuccess?.();
     } catch {
@@ -124,10 +128,16 @@ const CoupleBinding: React.FC<CoupleBindingProps> = ({ onBindingSuccess }) => {
             <p>🎉 现在你们可以共同管理所有情侣事件</p>
             <p>📝 共享未来清单、心愿清单和回忆相册</p>
           </div>
-          <button onClick={handleUnbind} className="unbind-btn">
-            <span>🔓</span>
-            解除绑定
-          </button>
+          <div className="action-buttons">
+            <button onClick={() => navigate("/")} className="home-btn">
+              <span>🏠</span>
+              返回首页
+            </button>
+            <button onClick={handleUnbind} className="unbind-btn">
+              <span>🔓</span>
+              解除绑定
+            </button>
+          </div>
         </div>
       </div>
     );
@@ -136,6 +146,14 @@ const CoupleBinding: React.FC<CoupleBindingProps> = ({ onBindingSuccess }) => {
   // 显示绑定界面
   return (
     <div className="couple-binding">
+      {/* 顶部返回按钮 */}
+      <div className="binding-header">
+        <button type="button" onClick={() => navigate("/")} className="back-to-home-btn">
+          <span>←</span>
+          <span>返回主页</span>
+        </button>
+      </div>
+
       {/* 待处理的绑定请求 */}
       {pendingRequests.length > 0 && (
         <div className="pending-requests">
@@ -265,6 +283,13 @@ const CoupleBinding: React.FC<CoupleBindingProps> = ({ onBindingSuccess }) => {
               <span>所有操作都会实时同步给对方</span>
             </div>
           </div>
+        </div>
+
+        <div className="back-home-section">
+          <button onClick={() => navigate("/")} className="back-home-btn">
+            <span>🏠</span>
+            返回首页
+          </button>
         </div>
       </div>
     </div>

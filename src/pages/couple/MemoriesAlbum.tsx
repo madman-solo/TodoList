@@ -10,7 +10,8 @@ import {
   FaHeart,
   FaFolder,
 } from "react-icons/fa";
-import { useThemeStore } from "../../store";
+import { useThemeStore, useUserStore } from "../../store";
+import { trackActivity } from "../../utils/activityTracker";
 
 // 定义相册类型
 interface Album {
@@ -31,6 +32,7 @@ interface Folder {
 const MemoriesAlbum = () => {
   const navigate = useNavigate();
   const { isDarkMode } = useThemeStore();
+  const { user } = useUserStore();
   const [searchQuery, setSearchQuery] = useState("");
   const [folders, setFolders] = useState<Folder[]>([
     { id: "all", name: "全部" },
@@ -83,6 +85,11 @@ const MemoriesAlbum = () => {
           const updatedAlbums = [...albums, newAlbum];
           setAlbums(updatedAlbums);
           localStorage.setItem("memories", JSON.stringify(updatedAlbums));
+
+          // 追踪活跃度
+          if (user?.id) {
+            trackActivity(String(user.id), "memories");
+          }
         };
         reader.readAsDataURL(file);
       });
@@ -121,6 +128,11 @@ const MemoriesAlbum = () => {
       const updatedAlbums = albums.filter((album) => album.id !== albumId);
       setAlbums(updatedAlbums);
       localStorage.setItem("memories", JSON.stringify(updatedAlbums));
+
+      // 追踪活跃度
+      if (user?.id) {
+        trackActivity(String(user.id), "memories");
+      }
     }
   };
 

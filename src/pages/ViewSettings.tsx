@@ -1,12 +1,22 @@
 /** @jsxImportSource @emotion/react */
 import { css } from "@emotion/react";
 import { useThemeStore } from "../store";
+import { useNavigate } from "react-router-dom";
+import { FaArrowLeft } from "react-icons/fa";
 
 const ViewSettings = () => {
   const { isDarkMode, toggleDarkMode } = useThemeStore();
+  const navigate = useNavigate();
+
+  const goBack = () => {
+    navigate("/profile");
+  };
 
   return (
     <div css={container(isDarkMode)}>
+      <button css={backButton} onClick={goBack} type="button">
+        <FaArrowLeft size={20} />
+      </button>
       <h2 css={pageTitle}>视图设置</h2>
 
       <div css={settingCard}>
@@ -139,6 +149,32 @@ const container = (isDarkMode: boolean) => css`
       top: 70%;
       opacity: 1;
     }
+  }
+`;
+
+const backButton = css`
+  position: absolute;
+  top: 2rem;
+  right: 2rem;
+  width: 45px;
+  height: 45px;
+  border-radius: 50%;
+  border: 2px solid #e8b4d9;
+  background: rgba(255, 255, 255, 0.9);
+  color: #e8b4d9;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  z-index: 10;
+  backdrop-filter: blur(10px);
+
+  &:hover {
+    background: #e8b4d9;
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(232, 180, 217, 0.3);
   }
 `;
 

@@ -46,32 +46,15 @@
 // export default BirthdayPage;
 
 import { useNavigate } from "react-router-dom";
-import { FaArrowLeft, FaPlus } from "react-icons/fa";
+import { FaArrowLeft, FaPlus, FaBell } from "react-icons/fa";
 import { useThemeStore } from "../../store";
-import { useState, useEffect } from "react";
-
-// 定义生日数据类型
-interface Birthday {
-  id: string;
-  name: string;
-  gender: "male" | "female" | "other";
-  date: string;
-  reminder: boolean;
-  phone?: string;
-}
+import { useBirthdayStore } from "../../store";
+import { useEffect } from "react";
 
 const BirthdayPage = () => {
   const navigate = useNavigate();
   const { isDarkMode } = useThemeStore();
-  const [birthdays, setBirthdays] = useState<Birthday[]>([]);
-
-  // 从本地存储加载生日数据
-  useEffect(() => {
-    const savedBirthdays = localStorage.getItem("birthdays");
-    if (savedBirthdays) {
-      setBirthdays(JSON.parse(savedBirthdays));
-    }
-  }, []);
+  const { birthdays, getUpcomingBirthdays } = useBirthdayStore();
 
   const goBack = () => {
     navigate("/profile");
@@ -80,6 +63,25 @@ const BirthdayPage = () => {
   const goToCreateBirthday = () => {
     navigate("/birthday/create");
   };
+
+  // 计算距离生日的天数
+  const getDaysUntilBirthday = (dateString: string) => {
+    const today = new Date();
+    const birthdayDate = new Date(dateString);
+    const thisYearBirthday = new Date(
+      today.getFullYear(),
+      birthdayDate.getMonth(),
+      birthdayDate.getDate()
+    );
+
+    const diffTime = thisYearBirthday.getTime() - today.getTime();
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+    return diffDays;
+  };
+
+  // 获取即将到来的生日
+  const upcomingBirthdays = getUpcomingBirthdays();
 
   return (
     <div className={`birthday-page ${isDarkMode ? "dark-mode" : ""}`}>
@@ -90,6 +92,31 @@ const BirthdayPage = () => {
         </button>
         <h2>生日</h2>
       </div>
+
+      {/* 生日提醒区域 */}
+      {upcomingBirthdays.length > 0 && (
+        <div className="birthday-reminders">
+          <h3>
+            <FaBell /> 即将到来的生日
+          </h3>
+          {upcomingBirthdays.map((birthday) => {
+            const daysUntil = getDaysUntilBirthday(birthday.date);
+            return (
+              <div key={birthday.id} className="reminder-item">
+                <div className="reminder-avatar">{birthday.name.charAt(0)}</div>
+                <div className="reminder-info">
+                  <h4>{birthday.name}</h4>
+                  <p>
+                    {daysUntil === 0
+                      ? "🎉 今天生日！"
+                      : `还有 ${daysUntil} 天`}
+                  </p>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
 
       {/* 第二个模块：生日列表或提示 */}
       <div className="page-content">

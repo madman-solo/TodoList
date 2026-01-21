@@ -1,7 +1,8 @@
 import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { FaArrowLeft, FaEllipsisV } from "react-icons/fa";
-import { useThemeStore } from "../../store";
+import { useThemeStore, useUserStore } from "../../store";
+import { trackActivity } from "../../utils/activityTracker";
 // todo：在创建相册页面内点击移动到，选择一个文件夹，再次回到该创建相册页面时内容不会消失，同时该相册会被放进该文件夹下，在回忆相册的页面中点击该文件夹可以看到该相册。
 interface Album {
   id: string;
@@ -16,6 +17,7 @@ const CreateMemory = () => {
   const navigate = useNavigate();
   // const location = useLocation();
   const { isDarkMode } = useThemeStore();
+  const { user } = useUserStore();
   const [albumName, setAlbumName] = useState("");
   const [currentDate, setCurrentDate] = useState("");
   const [showOptions, setShowOptions] = useState(false);
@@ -131,6 +133,11 @@ const CreateMemory = () => {
     }
 
     localStorage.setItem("memories", JSON.stringify(albums));
+
+    // 追踪活跃度
+    if (user?.id) {
+      trackActivity(String(user.id), "memories");
+    }
 
     // 清除临时存储
     localStorage.removeItem("pageInput");

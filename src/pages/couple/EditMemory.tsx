@@ -1,7 +1,8 @@
 import { useState, useEffect, useRef } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { FaArrowLeft, FaEllipsisV, FaImage } from "react-icons/fa";
-import { useThemeStore } from "../../store";
+import { useThemeStore, useUserStore } from "../../store";
+import { trackActivity } from "../../utils/activityTracker";
 
 interface Album {
   id: string;
@@ -16,6 +17,7 @@ const EditMemory = () => {
   const navigate = useNavigate();
   const { albumId } = useParams<{ albumId: string }>();
   const { isDarkMode } = useThemeStore();
+  const { user } = useUserStore();
   const [albumName, setAlbumName] = useState("");
   const [currentDate, setCurrentDate] = useState("");
   const [showOptions, setShowOptions] = useState(false);
@@ -106,6 +108,12 @@ const EditMemory = () => {
       };
 
       localStorage.setItem("memories", JSON.stringify(albums));
+
+      // 追踪活跃度
+      if (user?.id) {
+        trackActivity(String(user.id), "memories");
+      }
+
       navigate("/memories");
     }
   };
